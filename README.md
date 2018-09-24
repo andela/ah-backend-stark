@@ -7,6 +7,9 @@ by leveraging the modern web.
 
 ---
 
+## Database Setup
+Modify the .env file and change the dummy fields to your respective database connection credencials
+
 ## API Spec
 The preferred JSON object to be returned by the API should be structured as follows:
 
