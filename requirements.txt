@@ -10,5 +10,6 @@ idna==2.7
 jwt==0.5.4
 psycopg2==2.7.5
 pycparser==2.19
+python-dotenv==0.9.1
 pytz==2018.5
 six==1.11.0
