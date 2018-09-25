@@ -1,0 +1,15 @@
+[run]
+
+[report]
+omit = authors/__init__.py
+        authors/apps/__init__.py
+        authors/apps/authentication/__init__.py
+        authors/apps/authentication/migrations/0001_initial.py
+        authors/apps/authentication/migrations/__init__.py
+        authors/apps/core/__init__.py
+        authors/apps/profiles/__init__.py
+        authors/settings.py
+        authors/urls.py
+        authors/apps/authentication/urls.py
+[html]
+directory = coverage_html
