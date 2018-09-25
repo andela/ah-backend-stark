@@ -10,3 +10,4 @@ jwt==0.5.4
 pycparser==2.19
 pytz==2018.5
 six==1.11.0
+whitenoise==4.1
