@@ -7,9 +7,9 @@ django-cors-headers==2.4.0
 django-extensions==2.1.2
 djangorestframework==3.8.2
 idna==2.7
-jwt==0.5.4
 psycopg2==2.7.5
 pycparser==2.19
+PyJWT==1.6.4
 python-dotenv==0.9.1
 pytz==2018.5
 six==1.11.0
