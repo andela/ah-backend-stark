@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'authors.apps.authentication',
     'authors.apps.core',
     'authors.apps.profiles',
+    'django_nose',
 ]
 
 MIDDLEWARE = [
@@ -141,3 +142,12 @@ REST_FRAMEWORK = {
         #'authors.apps.authentication.backends.JWTAuthentication',
    # ), 
 }
+
+# use nose to run all tests
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+# tell nose to measure coverage on the 'authors' app
+NOSE_ARGS = [
+    '--with-coverage',
+    '--cover-package=authors',
+]
