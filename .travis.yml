@@ -13,9 +13,15 @@ install:
   - pip install -r requirements.txt
   - pip install coverage
   - pip install coveralls
+
+before_script:
+  - psql -c 'CREATE DATABASE test_db;' -U postgres
+
 script:
+  - python manage.py makemigrations
+  - python manage.py migrate
   - coverage run --source=authors/ manage.py test
   - coverage report -m
-  - coveralls
+
 after_success:
   - coveralls
