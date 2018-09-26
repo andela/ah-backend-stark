@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'authors.apps.core',
     'authors.apps.profiles',
     'django_nose',
+    'authors.apps.articles',
 ]
 
 MIDDLEWARE = [
