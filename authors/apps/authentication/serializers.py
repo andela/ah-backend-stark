@@ -23,7 +23,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         model = User
         # List all of the fields that could possibly be included in a request
         # or response, including fields specified explicitly above.
-        fields = ['email', 'username', 'password']
+        fields = ['email', 'username', 'password','token']
 
     def create(self, validated_data):
         # Use the `create_user` method we wrote earlier to create a new user.
@@ -34,6 +34,7 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.CharField(max_length=255)
     username = serializers.CharField(max_length=255, read_only=True)
     password = serializers.CharField(max_length=128, write_only=True)
+    token = serializers.CharField(read_only=True, max_length=255)
 
 
     def validate(self, data):
@@ -87,6 +88,7 @@ class LoginSerializer(serializers.Serializer):
         return {
             'email': user.email,
             'username': user.username,
+            'token':user.token
 
         }
 
