@@ -99,7 +99,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         This string is used when a `User` is printed in the console.
         """
         return self.email
-
+        
     @property
     def get_full_name(self):
       """
@@ -117,4 +117,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         return self.username
 
-
+    def token(self):
+        """This method creates a token for a user who registers successfully"""
+        data = {
+            "id": self.id, "username": self.username,
+            "exp": datetime.now() + timedelta(days=1)
+        }
+        token = jwt.encode(data, settings.SECRET_KEY).decode('utf-8')
+        return token
