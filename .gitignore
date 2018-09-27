@@ -99,3 +99,6 @@ db.sqlite3
 
 #vscode
 .vscode
+
+#DS store
+.DS_Store

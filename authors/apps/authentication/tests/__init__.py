@@ -17,8 +17,43 @@ class BaseTest(TestCase):
             "email":"test@test.com",
             "password":"testpassword"}
         }
-        self.reg_data_no_username= {"user": {
+
+        self.missing_username= {
+            "user": {
             "username":"",
             "email":"test@test.com",
-            "password":"testpassword"}
+            "password":"test_password"
+            }
         }
+
+        self.missing_email= {
+            "user": {
+            "username":"test",
+            "email":"",
+            "password":"test_password"
+            }
+        }
+
+        self.invalid_email= {
+            "user": {
+            "username":"test",
+            "email":"test",
+            "password":"test_password"
+            }
+        }
+
+        self.short_password= {
+            "user": {
+            "username":"test",
+            "email":"test@test.com",
+            "password":"test"
+            }
+        }
+
+        self.non_alphanumeric_password= {
+            "user": {
+            "username":"test",
+            "email":"test@test.com",
+            "password":"@$* p#$%"
+            }
+        }   
