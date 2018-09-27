@@ -12,9 +12,7 @@ class ArticleSerializer(serializers.ModelSerializer):
     #slug = serializers.SlugField()
     description = serializers.CharField(max_length=500)
     body = serializers.CharField()
-    # created_on = serializers.DateTimeField()
-    # updated_on = serializers.DateTimeField()
-    #author = serializers.CharField()
+    
 
     def create(self,validated_data):
         """
@@ -26,4 +24,4 @@ class ArticleSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Article
-        fields = ("id","title","description","body","author")
+        fields = ("id","title","description","body","tagList","author")
