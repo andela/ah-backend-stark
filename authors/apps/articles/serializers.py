@@ -4,6 +4,9 @@ from django.template.defaultfilters import slugify
 from rest_framework import serializers
 
 from .models import Article
+from authors.apps.authentication.models import User
+from authors.apps.authentication.backends import JWTAuthentication
+from ast import literal_eval
 
 class ArticleSerializer(serializers.ModelSerializer):
     """ 
@@ -18,4 +21,23 @@ class ArticleSerializer(serializers.ModelSerializer):
  
     class Meta:
         model = Article
-        fields = ("title", "description", "body", "tagList", "author")
+        fields = ("slug","title", "description", "body",
+         "tagList","createdAt","updatedAt","favorited","favoritesCount", "author")
+
+    @staticmethod
+    def convert_tagList_to_str(request_data={}):
+        modified_data = request_data
+        if modified_data.get('tagList', None):
+           modified_data['tagList'] = str(request_data['tagList'])
+        return modified_data
+
+    @staticmethod
+    def convert_tagList_str_to_list(data={}):
+        modified_data = data
+        if modified_data.get('tagList', None):
+           modified_data['tagList'] = literal_eval(data['tagList'])
+        return modified_datagit 
+
+    
+        
+
