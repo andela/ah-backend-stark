@@ -11,6 +11,11 @@ class TestUser(BaseTest):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         assert "username" in response.data
         assert "token" in response.data
+    
+    def test_creating_user_with_no_username(self):
+        """"This method tests creating a new user"""
+        response = self.client.post("/api/users/", self.reg_data_no_username, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_logging_in(self):
         """"This method tests logging in a user"""

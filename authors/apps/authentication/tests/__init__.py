@@ -17,3 +17,8 @@ class BaseTest(TestCase):
             "email":"test@test.com",
             "password":"testpassword"}
         }
+        self.reg_data_no_username= {"user": {
+            "username":"",
+            "email":"test@test.com",
+            "password":"testpassword"}
+        }

@@ -12,11 +12,10 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 import os
 import dj_database_url
-import django_heroku
 from db_config import get_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
@@ -40,7 +39,7 @@ STATICFILES_DIRS = (
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-ALLOWED_HOSTS = ['stark-authors-staging.herokuapp.com', 'stark-authors-productin.herokuapp.com', 'localhost']
+ALLOWED_HOSTS = ['ah-backend-stark-staging.herokuapp.com', 'ah-backend-stark.herokuapp.com', 'localhost', 'http://127.0.0.1:8000/']
 
 # Application definition
 
@@ -158,7 +157,9 @@ REST_FRAMEWORK = {
    # ), 
 }
 
-django_heroku.settings(locals())
+# import django_heroku
+# # Activate django-heroku
+# django_heroku.settings(locals(), test_runner=False)
 
 # use nose to run all tests
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
