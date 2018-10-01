@@ -76,18 +76,38 @@ class Article(models.Model):
 
         return unique_slug
 
-    @property
-    def tags(self):
-        """
-        This will leverage python's ast module to convert the tagList field
-        back to its original python datatype i.e, list
+    @staticmethod
+    def title_exists(user_id,title):
+        return Article.objects.filter(author=user_id,title__iexact=title).exists()
 
-        """
-        tag_list = literal_eval(self.tagList)
-        
-        if isinstance(tag_list,str):
-            tag_list = [] # No tags were specified for the article. Just return an empty list
-        return tag_list
+
+    @staticmethod
+    def get_single_article(slug):
+        pass
+
+    @staticmethod
+    def format_data_for_display(data):
+
+        # Format the tagList field and convert it back to list format
+        formatted_data = data
+        if isinstance(data,list):
+
+           for count,record in enumerate(formatted_data):
+               taglist = formatted_data[count]['tagList']
+               if taglist:
+                   formatted_data[count]['tagList'] = literal_eval(taglist)
+               else:
+                   formatted_data[count]['tagList'] = []
+
+        else:
+            if isinstance(data,dict):
+                taglist = formatted_data.get('tagList')
+                if taglist:
+                    formatted_data['tagList'] = literal_eval(taglist)
+                else:
+                    formatted_data['tagList'] = []
+
+        return formatted_data
 
 
     def __str__(self):

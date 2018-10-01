@@ -2,7 +2,6 @@ from django.contrib.auth import authenticate
 from django.template.defaultfilters import slugify
 
 from rest_framework import serializers
-
 from .models import Article
 from authors.apps.authentication.models import User
 from authors.apps.authentication.backends import JWTAuthentication
@@ -34,9 +33,9 @@ class ArticleSerializer(serializers.ModelSerializer):
     @staticmethod
     def convert_tagList_str_to_list(data={}):
         modified_data = data
-        if modified_data.get('tagList', None):
+        if modified_data.get('tagList', None): 
            modified_data['tagList'] = literal_eval(data['tagList'])
-        return modified_datagit 
+        return modified_data
 
     
         
