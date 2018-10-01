@@ -12,11 +12,10 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 import os
 import dj_database_url
-import django_heroku
 from db_config import get_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
@@ -25,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 SECRET_KEY = '7pgozr2jn7zs_o%i8id6=rddie!*0f0qy3$oy$(8231i^4*@u3'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -40,7 +39,7 @@ STATICFILES_DIRS = (
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-ALLOWED_HOSTS = ['stark-authors-staging.herokuapp.com', 'stark-authors-productin.herokuapp.com', 'localhost']
+ALLOWED_HOSTS = ['ah-backend-stark-staging.herokuapp.com', 'ah-backend-stark.herokuapp.com', 'localhost']
 
 # Application definition
 
@@ -59,6 +58,7 @@ INSTALLED_APPS = [
     'authors.apps.authentication',
     'authors.apps.core',
     'authors.apps.profiles',
+    'django_nose',
 ]
 
 MIDDLEWARE = [
@@ -157,4 +157,15 @@ REST_FRAMEWORK = {
    # ), 
 }
 
-django_heroku.settings(locals())
+import django_heroku
+# Activate django-heroku
+django_heroku.settings(locals(), test_runner=False)
+
+# use nose to run all tests
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+# tell nose to measure coverage on the 'authors' app
+NOSE_ARGS = [
+    '--with-coverage',
+    '--cover-package=authors',
+]
