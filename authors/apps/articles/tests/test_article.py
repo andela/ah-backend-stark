@@ -14,3 +14,11 @@ class TestArticle(BaseTest):
         self.assertIn('Titlely',response.data['title'])
         self.assertIn('This is my article',response.data['body'])
 
+    def test_get_all_articles(self):
+        pass
+
+    def test_get_single_article(self):
+        pass
+
+        
+

@@ -1,13 +1,4 @@
-import jwt
 import re
-from rest_framework.views import exceptions
-
-from datetime import datetime, timedelta
-
-from django.conf import settings
-from django.contrib.auth.models import (
-    AbstractBaseUser, BaseUserManager, PermissionsMixin
-)
 from django.db import models
 from django.template.defaultfilters import slugify
 from authors.apps.authentication.models import User
@@ -43,7 +34,7 @@ class Article(models.Model):
     def generate_slug(self):
         """
         This method generates a unique slug for every article by first
-        checking for the existence of a given title
+        checking for its existence
         """
         slug = slugify(self.title)
         current_slug_queryset = Article.objects.filter(slug__istartswith=slug)
@@ -53,26 +44,17 @@ class Article(models.Model):
         if slug_count:
             current_slug_queryset.order_by('slug')
 
-            if Article.objects.filter(author=self.author,title__iexact=self.title).exists():
-                # this author already has a title with the same name
-                # return conflict error code
+            last_article = current_slug_queryset.last()
+            last_slug_str = last_article.slug
+            last_digits_regx = "\d+$"
+            slug_matches = re.search(last_digits_regx, last_slug_str)
 
-                # A wrong status code is being returned here. 
-                # Still a work in progress
-                raise exceptions.NotAcceptable('You already have an article with the same title')
-                ##
-                ##
-
+            if slug_matches:
+                last_digits = int(slug_matches.group())
+                last_digits += 1
+                unique_slug = slug + str(last_digits)
             else:
-                last_slug = current_slug_queryset.last()
-                last_slug_str = last_slug.slug
-                last_digits_regx = "\d+$"
-                slug_matches = re.search(last_digits_regx, last_slug_str)
-
-                if slug_matches:
-                    last_digits = int(slug_matches.group())
-                    last_digits+=1
-                    unique_slug = slug + str(last_digits)
+                unique_slug += "00"
 
         return unique_slug
 
@@ -83,7 +65,7 @@ class Article(models.Model):
 
     @staticmethod
     def get_single_article(slug):
-        pass
+        return Article.objects.filter(slug=slug)
 
     @staticmethod
     def format_data_for_display(data):
@@ -100,8 +82,8 @@ class Article(models.Model):
                    formatted_data[count]['tagList'] = []
 
         else:
-            if isinstance(data,dict):
-                taglist = formatted_data.get('tagList')
+            if isinstance(data, dict):
+                taglist = formatted_data.get('tagList',None)
                 if taglist:
                     formatted_data['tagList'] = literal_eval(taglist)
                 else:
@@ -111,6 +93,6 @@ class Article(models.Model):
 
 
     def __str__(self):
-        return self.title
+        return self.title + " "+self.tagList
 
 

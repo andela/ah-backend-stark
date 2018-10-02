@@ -1,13 +1,11 @@
-from django.contrib.auth import authenticate
-from django.template.defaultfilters import slugify
-
 from rest_framework import serializers
 from .models import Article
 from authors.apps.authentication.models import User
 from authors.apps.authentication.backends import JWTAuthentication
 from ast import literal_eval
 
-class ArticleSerializer(serializers.ModelSerializer):
+    
+class ArticlesSerializer(serializers.ModelSerializer):
     """ 
     Handles the serialization and deserialization of Article objects
     """

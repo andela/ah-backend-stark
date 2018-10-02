@@ -1,18 +1,17 @@
 import json
-from rest_framework import status,serializers
-from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework import status,serializers,exceptions
 from rest_framework.permissions import AllowAny,IsAuthenticated,IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .renderers import ArticleJSONRenderer
-from .serializers import ArticleSerializer
+from .serializers import ArticlesSerializer
 from .models import Article
 from authors.apps.authentication.backends import JWTAuthentication
 
 class ArticleCreationAPIView(APIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
-    serializer_class = ArticleSerializer
+    serializer_class = ArticlesSerializer
 
     def get(self,request):
         article = Article.objects.all()
@@ -28,7 +27,7 @@ class ArticleCreationAPIView(APIView):
         if Article.title_exists(user.id, article['title']):
             raise serializers.ValidationError('You already have an article with the same title',409)
         
-        article = ArticleSerializer.convert_tagList_to_str(article)
+        article = ArticlesSerializer.convert_tagList_to_str(article)
         serializer = self.serializer_class(data=article)
         serializer.is_valid(raise_exception=True)
         save_status = serializer.save()
@@ -44,7 +43,17 @@ class ArticleCreationAPIView(APIView):
         pass
 
 class GetSingleArticleAPIView(APIView):
-    pass
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    serializer_class = ArticlesSerializer
+    def get(self,request,slug):
+        article = Article.get_single_article(slug)
+      
+        if not article:
+            raise exceptions.NotFound('The selected article was not found.')
+
+        serializer = self.serializer_class(article, many=True)
+        res_data = Article.format_data_for_display(serializer.data)
+        return Response({"article":res_data}, status.HTTP_200_OK)
 
 def get_user_from_auth(request):
     """
