@@ -156,10 +156,10 @@ REST_FRAMEWORK = {
         #'authors.apps.authentication.backends.JWTAuthentication',
    # ), 
 }
-
-# import django_heroku
-# # Activate django-heroku
-# django_heroku.settings(locals(), test_runner=False)
+if os.getenv('PRODUCTION', None):
+    import django_heroku
+    # Activate django-heroku
+    django_heroku.settings(locals(), test_runner=False)
 
 # use nose to run all tests
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
