@@ -23,8 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '7pgozr2jn7zs_o%i8id6=rddie!*0f0qy3$oy$(8231i^4*@u3'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -39,7 +38,7 @@ STATICFILES_DIRS = (
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-ALLOWED_HOSTS = ['ah-backend-stark-staging.herokuapp.com', 'ah-backend-stark.herokuapp.com', 'localhost', 'http://127.0.0.1:8000/']
+ALLOWED_HOSTS = ['ah-backend-stark-staging.herokuapp.com', 'ah-backend-stark.herokuapp.com', 'localhost', '127.0.0.1']
 
 # Application definition
 
@@ -156,10 +155,11 @@ REST_FRAMEWORK = {
         #'authors.apps.authentication.backends.JWTAuthentication',
    # ), 
 }
-
-# import django_heroku
-# # Activate django-heroku
-# django_heroku.settings(locals(), test_runner=False)
+if os.getenv('PRODUCTION', None):
+    import django_heroku
+    # Activate django-heroku
+    django_heroku.settings(locals(), test_runner=False)
+    DEBUG = False
 
 # use nose to run all tests
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'

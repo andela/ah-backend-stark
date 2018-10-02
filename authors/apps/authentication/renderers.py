@@ -16,10 +16,14 @@ class UserJSONRenderer(JSONRenderer):
         if errors is not None:
             # As mentioned about, we will let the default JSONRenderer handle
             # rendering errors.
-            return super(UserJSONRenderer, self).render(data)
+            # return super(UserJSONRenderer, self).render(data)
+            return json.dumps({
+                'errors': errors
+            })
 
 
         # Finally, we can render our data under the "user" namespace.
         return json.dumps({
+            'message' : 'User successfully registered',
             'user': data
         })
