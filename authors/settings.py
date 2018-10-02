@@ -58,11 +58,8 @@ INSTALLED_APPS = [
     'authors.apps.authentication',
     'authors.apps.core',
     'authors.apps.profiles',
-<<<<<<< HEAD
     'django_nose',
-=======
     'authors.apps.articles',
->>>>>>> Add articles app
 ]
 
 MIDDLEWARE = [
