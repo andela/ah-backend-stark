@@ -10,15 +10,29 @@ class BaseTest(TestCase):
             "email":"userx@gmail.com",
             "password":"thispassword"}
         }
+        self.sample_login_credencials ={"user": {
+            "email":"userx@gmail.com",
+            "password":"thispassword"}
+        }
         self.article_1 = {"article": {
             "title": "Titlely",
             "description": "Now, how do you describe this?",
             "body": "This is my article",
-            "tagList":"Health,Safety",
-            "author": 1
+            "tagList":["Health","Safety"]
                } 
         }
 
-    def register_user(self,user_data):
-        self.client.post("/api/users/", user_data, format="json")
+
+    def mock_login(self):
+        self.client.post("/api/users/", self.sample_user, format="json")
+        login_response = self.client.post("/api/users/login/",
+         self.sample_login_credencials, format="json")
+
+        data = login_response.data
+        token = data['token']
+        self.set_headers(token)
+
+    def set_headers(self,token):
+        self.client.credentials(HTTP_TOKEN=token)
+
         

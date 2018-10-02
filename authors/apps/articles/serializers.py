@@ -28,12 +28,12 @@ class ArticlesSerializer(serializers.ModelSerializer):
            modified_data['tagList'] = str(request_data['tagList'])
         return modified_data
 
-    @staticmethod
-    def convert_tagList_str_to_list(data={}):
-        modified_data = data
-        if modified_data.get('tagList', None): 
-           modified_data['tagList'] = literal_eval(data['tagList'])
-        return modified_data
+    # @staticmethod
+    # def convert_tagList_str_to_list(data={}):
+    #     modified_data = data
+    #     if modified_data.get('tagList', None): 
+    #        modified_data['tagList'] = literal_eval(data['tagList'])
+    #     return modified_data
 
     
         
