@@ -120,3 +120,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         }
         token = jwt.encode(data, settings.SECRET_KEY).decode('utf-8')
         return token
+
+    def complete_profile(self):
+        return "You have successfully registered, now complete your profile"    

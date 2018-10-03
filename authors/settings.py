@@ -150,22 +150,22 @@ AUTH_USER_MODEL = 'authentication.User'
 
 REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'authors.apps.core.exceptions.core_exception_handler',
-    'NON_FIELD_ERRORS_KEY': 'error' #,
+    'NON_FIELD_ERRORS_KEY': 'error',
 
-    # 'DEFAULT_AUTHENTICATION_CLASSES': (
-        #'authors.apps.authentication.backends.JWTAuthentication',
-   # ), 
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'authors.apps.authentication.backends.JWTAuthentication',
+    ), 
 }
 if os.getenv('PRODUCTION', None):
     import django_heroku
     # Activate django-heroku
     django_heroku.settings(locals(), test_runner=False)
 
-# use nose to run all tests
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+# # use nose to run all tests
+# TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
-# tell nose to measure coverage on the 'authors' app
-NOSE_ARGS = [
-    '--with-coverage',
-    '--cover-package=authors',
-]
+# # tell nose to measure coverage on the 'authors' app
+# NOSE_ARGS = [
+#     '--with-coverage',
+#     '--cover-package=authors',
+# ]
