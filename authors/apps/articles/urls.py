@@ -5,4 +5,5 @@ from .views import ArticleCreationAPIView, GetSingleArticleAPIView
 urlpatterns = [
     path('articles/',ArticleCreationAPIView.as_view()),
     path('articles/<str:slug>',GetSingleArticleAPIView.as_view())
+    #path('articles/rate_article/<str:slug>',GetSingleArticleAPIView.as_view())
 ]

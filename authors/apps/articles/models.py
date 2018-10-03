@@ -18,6 +18,7 @@ class Article(models.Model):
     updatedAt = models.DateTimeField(auto_now_add=True)
     favorited = models.BooleanField(default=False)
     favoritesCount = models.IntegerField(default=0)
+    rating = models.IntegerField
     author = models.ForeignKey(User,on_delete=models.CASCADE)
 
     

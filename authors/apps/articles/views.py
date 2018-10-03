@@ -36,15 +36,29 @@ class ArticleCreationAPIView(APIView):
     
         return Response(res_data, status=status.HTTP_201_CREATED)
 
-    def put(self,request):
-        pass
-
-    def delete(self,request):
-        pass
 
 class GetSingleArticleAPIView(APIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     serializer_class = ArticlesSerializer
+    
+    def rate_article(self,request,slug):
+        article = Article.get_single_article(slug)
+        
+        if not article:
+            raise exceptions.NotFound('The selected article was not found.')
+
+        #modified_data = request.data.get('article')
+        article['title'] = request.data['title']
+        article['body'] = request.data['body']
+        print(request.data['title'])
+        article = ArticlesSerializer.convert_tagList_to_str(article)
+        serializer = self.serializer_class(data=article)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        res_data = Article.format_data_for_display(serializer.data)
+    
+        return Response(res_data, status=status.HTTP_200_OK)
+
     def get(self,request,slug):
         article = Article.get_single_article(slug)
       
@@ -54,8 +68,14 @@ class GetSingleArticleAPIView(APIView):
         serializer = self.serializer_class(article, many=True)
         res_data = Article.format_data_for_display(serializer.data)
         return Response({"article":res_data}, status.HTTP_200_OK)
+    
+    def put(self,request,slug):
+        pass
+    
+    def delete(self,request,slug):
+        pass
 
-def get_user_from_auth(request):
+def get_user_from_auth(self,request,slug):
     """
     This helper function returns an instance of the authenticated user and their token
     from the authentication class
