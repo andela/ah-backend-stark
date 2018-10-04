@@ -103,3 +103,6 @@ db.sqlite3
 
 #DS store
 .DS_Store
+
+# migrations folder and files
+migrations

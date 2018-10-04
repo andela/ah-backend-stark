@@ -65,6 +65,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     # but we can still analyze the data.
     is_active = models.BooleanField(default=True)
 
+    # When a user creates a user account, they are required to activate their accounts 
+    # before they can be able to login and use the app. They can only do this by following
+    #  the activation link sent to the emails they used to signup
+    is_verified = models.BooleanField(default=False)
+
     # The `is_staff` flag is expected by Django to determine who can and cannot
     # log into the Django admin site. For most users, this flag will always be
     # falsed.
@@ -121,5 +126,3 @@ class User(AbstractBaseUser, PermissionsMixin):
         token = jwt.encode(data, settings.SECRET_KEY).decode('utf-8')
         return token
 
-    def complete_profile(self):
-        return "You have successfully registered, now complete your profile"    

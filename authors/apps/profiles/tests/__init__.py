@@ -36,4 +36,5 @@ class BaseTest(TestCase):
         self.register_user = self.client.post("/api/users/", self.reg_data2, format="json")                       
         self.register_user = self.client.post("/api/users/", self.reg_data, format="json")
         token1 = self.register_user.data["token"]
+        self.client.get("/api/users/activate_account/{}/".format(token1))
         self.client.credentials(HTTP_TOKEN=token1)
