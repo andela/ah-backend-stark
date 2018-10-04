@@ -32,7 +32,9 @@ class TestUser(BaseTest):
 
     def test_logging_in(self):
         """"This method tests logging in a user"""
-        self.client.post("/api/users/", self.reg_data, format="json")
+        res = self.client.post("/api/users/", self.reg_data, format="json")
+        token = res.data['token']
+        self.client.get("/api/users/activate_account/{}/".format(token))
         response = self.client.post("/api/users/login/", self.login_data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn(self.login_data['user']['email'],response.data['email'])
@@ -108,11 +110,15 @@ class TestUser(BaseTest):
         assert "detail" in response.data
 
     def test_confirm_reset(self):
-        """"This method tests creating a new user"""
-        client = APIClient()
-        token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9"
-        ".eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsImV4cCI6MTUzODU2OTI4M"
-        "30.PP8TfDmrEA5oDXLkoePqw5zS9Bw6nzhtJVLhWm76GUc"
-        client.credentials(HTTP_TOKEN=token)
+        """"This method tests successful resetting of a user password"""
+
+        res = self.client.post("/api/users/", self.reg_data, format="json")
+        token = res.data['token']
+        self.client.get("/api/users/activate_account/{}/".format(token))
+        resp = self.client.post("/api/password-reset/", data=self.user_email, format="json")
+        token = resp.data['token']
+        x = self.client.get("/api/password-reset/{}/".format(token))
+        token = x.data['token']
+        self.client.credentials(HTTP_TOKEN=token)
         response = self.client.put("/api/password/reset/done/", data=self.password_update, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)

@@ -41,11 +41,6 @@ class BaseTest(TestCase):
             "password":"testpassword"}
                            }
 
-        self.deactive_login = {"user": {
-            "email":"test6@test.com",
-            "password":"12345678"}
-                               }
-
         self.missing_username = {
             "user": {
                 "username":"",
@@ -96,10 +91,6 @@ class BaseTest(TestCase):
         self.user.is_active = True
         self.user.save()
 
-        register_user2 = self.client.post("/api/users/", self.deactive_user, format="json")
-        token1 = register_user2.data["token"]
-        self.client.credentials(HTTP_TOKEN=token1)
-
         self.article_1 = {"article": {
             "title": "Titlely",
             "description": "Now, how do you describe this?",
@@ -142,6 +133,11 @@ class BaseTest(TestCase):
                 }
         }
 
+        self.user_email = {"user": {
+            "email":"test@test.com"
+                    }
+        }
+
         # Test the article model functions
         self.article = Article.objects.create(title="my title",
                                                 description = 'my description',
@@ -167,7 +163,9 @@ class BaseTest(TestCase):
 
         It helps in authenticating requests
         """
-        self.client.post("/api/users/", self.reg_data, format="json")
+        res = self.client.post("/api/users/", self.reg_data, format="json")
+        token = res.data['token']
+        self.client.get("/api/users/activate_account/{}/".format(token))
         login_response = self.client.post("/api/users/login/",
                          self.login_data, format="json")
 
@@ -183,7 +181,9 @@ class BaseTest(TestCase):
 
         It helps in authenticating requests
         """
-        self.client.post("/api/users/", self.reg_data2, format="json")
+        res = self.client.post("/api/users/", self.reg_data2, format="json")
+        token = res.data['token']
+        self.client.get("/api/users/activate_account/{}/".format(token))
         login_response = self.client.post("/api/users/login/",
                          self.login_data2, format="json")
 

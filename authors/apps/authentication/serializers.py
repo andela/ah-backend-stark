@@ -22,7 +22,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         model = User
         # List all of the fields that could possibly be included in a request
         # or response, including fields specified explicitly above.
-        fields = ['email', 'username', 'password','token','complete_profile']
+        fields = ['email', 'username', 'password','token']
 
     def create(self, validated_data):
         # Use the `create_user` method we wrote earlier to create a new user.
@@ -79,6 +79,11 @@ class LoginSerializer(serializers.Serializer):
         if not user.is_active:
             raise serializers.ValidationError(
                 'This user has been deactivated.'
+            )
+
+        if not user.is_verified:
+            raise serializers.ValidationError(
+                'Account activation required before login'
             )
 
         # The `validate` method should return a dictionary of validated data.
@@ -148,6 +153,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 class ResetPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField(allow_blank=False)
+    token = serializers.CharField(read_only=True, max_length=255)
+    message = serializers.CharField(max_length=255, read_only=True)
 
     def validate(self, data):
         """ this method validates the user email"""
@@ -169,7 +176,8 @@ class ResetPasswordSerializer(serializers.Serializer):
         url = "http://127.0.0.1:8000/api/password-reset/"
         body = " follow this link to reset your password  {}{}/".format(url, token)
         sendMail(recipient, title, body)
-
         return {
-            'email': user,
+            'email': email,
+            'token': token,
+            'message': 'A link has been sent to your email'
         }

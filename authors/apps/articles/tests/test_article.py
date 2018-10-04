@@ -76,7 +76,6 @@ class TestArticle(BaseTest):
         edit_response = self.client.put('/api/articles/titlely', self.modified_article,format="json")
         get_response = self.client.get('/api/articles/modified-title')
         data = get_response.data.get('article')
-
         self.assertEqual(edit_response.status_code,status.HTTP_202_ACCEPTED)
         self.assertEqual(get_response.status_code,status.HTTP_200_OK)
         self.assertEqual(data.get('title'),"Modified title")
