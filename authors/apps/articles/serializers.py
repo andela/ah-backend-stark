@@ -19,7 +19,8 @@ class ArticlesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = ("slug", "title", "description", "body",
-         "tagList","createdAt","updatedAt","favorited","favoritesCount", "rating", "ratingsCount", "author")
+         "tagList","createdAt","updatedAt","favorited",
+         "favoritesCount", "rating", "ratingsCount", "author")
 
     @staticmethod
     def convert_tagList_to_str(request_data={}):

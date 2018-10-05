@@ -56,50 +56,42 @@ class RateArticleAPIView(APIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = ArticlesSerializer
 
+    def get_queryset_values(self, queryset):
+        return queryset.values()[0]
+    
     def put(self,request,slug):
-        #article = Article.get_single_article(slug)
-        article = request.data.get('article')
-        
+        article_queryset = Article.get_single_article(slug)
+        # article = get_query_set(article_queryset)
+        rated_article = request.data.get('article')
+
         if not article:
-            raise exceptions.NotFound('The selected article was not found.')
+            raise exceptions.NotFound(
+                'The selected article was not found.')
 
-        # rated_article = request.data.get('article')
-        # current_rating = article['rating']
-        # current_rating_count = article['ratingsCount']
-        # user_rating = rated_article['rating']
-        # new_rating = calculate_rating(
-        #                     current_rating, 
-        #                     current_rating_count, 
-        #                     user_rating
-        #                     )
-        # article['rating'] = new_rating[0]
-        # article['ratingsCount'] = new_rating[1]
-        
-        serializer = self.serializer_class(data=article, many=True)
-        #serializer = self.serializer_class(data=article, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        res_data = Article.format_data_for_display(serializer.data)
-    
-        return Response({"article": serializer}, status=status.HTTP_200_OK)
+        current_rating = article['rating']
+        current_rating_count = article['ratingsCount']
+        user_rating = rated_article.get('rating')
+        new_rating = Article.calculate_rating(
+                            current_rating, 
+                            current_rating_count, 
+                            user_rating)
+
+        rating = new_rating[0]
+        ratingsCount = new_rating[1]
+
+        article_queryset.update(
+                       rating = rating,
+                       ratingsCount = ratingsCount)
+
+        # serializer = self.serializer_class(data=article, many=True)
+        # Article.get_single_article(slug)
+        # serializer = self.serializer_class(data=article, partial=True)
+        # serializer.is_valid(raise_exception=True)
+        # serializer.save()
+        # res_data = Article.format_data_for_display(serializer.data)
+
+        return Response({"article":article_queryset.values()[0]}, status=status.HTTP_202_ACCEPTED)
         #return Response({"data":res_data}, status=status.HTTP_200_OK)
-    
-
-# class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
-#     permission_classes = (IsAuthenticated,)
-#     # renderer_classes = (UserJSONRenderer,)
-#     serializer_class = ArticlesSerializer
-
-#     def update(self, request, slug):
-#         article = Article.get_single_article(slug)
-
-#         serializer = self.serializer_class(
-#             request.user, data=serializer_data, partial=True
-#         )
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()
-
-#         return Response(serializer.data, status=status.HTTP_200_OK)
 
 def get_user_from_auth(request):
     """
@@ -109,10 +101,3 @@ def get_user_from_auth(request):
     auth = JWTAuthentication()
     user = auth.authenticate(request)[0]
     return user
-
-def calculate_rating(current_rating, current_rating_count, user_rating):
-    numerator = (current_rating * current_rating_count) + user_rating
-    current_rating_count += 1
-    res = numerator / current_rating_count
-    return res, current_rating_count
-    

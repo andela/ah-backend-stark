@@ -8,7 +8,6 @@ class Article(models.Model):
     """
     The Articles model class
     """
-
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True,max_length=255,blank=True)
     description = models.CharField(max_length=500)
@@ -18,11 +17,11 @@ class Article(models.Model):
     updatedAt = models.DateTimeField(auto_now_add=True)
     favorited = models.BooleanField(default=False)
     favoritesCount = models.IntegerField(default=0)
-    rating = models.IntegerField(default=0)
+    rating = models.FloatField(default=0)
     ratingsCount = models.IntegerField(default=0)
     author = models.ForeignKey(User,on_delete=models.CASCADE)
 
-    
+
     class Meta:
         ordering = ['createdAt']
 
@@ -93,8 +92,12 @@ class Article(models.Model):
 
         return formatted_data
 
+    @staticmethod
+    def calculate_rating(current_rating, current_rating_count, user_rating):
+        numerator = (current_rating * current_rating_count) + user_rating
+        current_rating_count += 1
+        res = numerator / current_rating_count
+        return res, current_rating_count
 
     def __str__(self):
         return self.title
-
-
