@@ -88,3 +88,34 @@ class BaseTest(TestCase):
         register_user2 = self.client.post("/api/users/", self.deactive_user, format="json")
         token1 = register_user2.data["token"]
         self.client.credentials(HTTP_TOKEN=token1)
+
+
+        self.article_1 = {"article": {
+            "title": "Titlely",
+            "description": "Now, how do you describe this?",
+            "body": "This is my article",
+            "tagList":["Health","Safety"]
+               } 
+        }
+
+        self.modified_article = {"article": {
+            "title": "Modified title",
+            "description": "The description is also different"
+               } 
+        }
+
+    def mock_login(self):
+        """
+        This helper method creates a user, logs then in,
+        gets their token and sets the 'Token' header to the
+        token generated during login
+
+        It helps in authenticating requests
+        """
+        self.client.post("/api/users/", self.reg_data, format="json")
+        login_response = self.client.post("/api/users/login/",
+                         self.login_data, format="json")
+
+        data = login_response.data
+        token = data['token']
+        self.client.credentials(HTTP_TOKEN=token)   
