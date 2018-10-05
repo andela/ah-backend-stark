@@ -15,11 +15,11 @@ class ArticlesSerializer(serializers.ModelSerializer):
         Create and return a new article instance given the validated data 
         """
         return Article.objects.create(**validated_data)
- 
+    
     class Meta:
         model = Article
-        fields = ("slug","title", "description", "body",
-         "tagList","createdAt","updatedAt","favorited","favoritesCount", "author")
+        fields = ("slug", "title", "description", "body",
+         "tagList","createdAt","updatedAt","favorited","favoritesCount", "rating", "ratingsCount", "author")
 
     @staticmethod
     def convert_tagList_to_str(request_data={}):
