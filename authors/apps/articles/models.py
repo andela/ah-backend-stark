@@ -3,6 +3,7 @@ from django.db import models
 from django.template.defaultfilters import slugify
 from authors.apps.authentication.models import User
 from ast import literal_eval
+from django.utils import timezone
 
 class Article(models.Model):
     """
@@ -112,13 +113,15 @@ class Article(models.Model):
             new_description = new_data.get('description',article.description)
             new_body = new_data.get('body',article.body)
             new_tagList = str(new_data.get('tagList',article.tagList))
+            updated_time= timezone.now()
 
             article_queryset.update(
                        title = new_title,
                        slug = new_slug,
                        description = new_description,
                        body = new_body,
-                       tagList = new_tagList)
+                       tagList = new_tagList,
+                       updatedAt=updated_time)
 
             article = Article.get_article(new_slug)
             # return the modified article instead of the default message
