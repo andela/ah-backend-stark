@@ -87,7 +87,7 @@ class ResetPasswordView(RetrieveUpdateAPIView):
         data = {
             "message": " A link has been sent to your email"
         }
-        return Response(data,
+        return Response(serializer.data,
                         status=status.HTTP_200_OK)
 
     def retrieve(self, request, token, *args, **kwargs):
