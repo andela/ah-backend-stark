@@ -125,8 +125,12 @@ class Article(models.Model):
             message = article     
             
         else:
-            statusCode = 404
-            message = 'The selected article could not be found'
+            if Article.article_exists(slug):
+                statusCode = 403
+                message = 'You do not have rights to edit the selected article'
+            else:
+                statusCode = 404
+                message = 'The selected article was not found'
 
         return (message, statusCode)
         
