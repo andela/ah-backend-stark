@@ -121,6 +121,22 @@ class BaseTest(TestCase):
             "description": "The description is also different"
                } 
         }
+
+        self.article_rating_4 = {"article": {
+            "rating": 4
+                }
+        }
+
+        self.article_rating_5 = {"article": {
+            "rating": 5
+                }
+        }
+
+        self.article_rating_6 = {"article": {
+            "rating": 6
+                }
+        }
+
         # Test the article model functions
         self.article = Article.objects.create(title="my title",
                                                 description = 'my description',

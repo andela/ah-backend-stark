@@ -10,15 +10,17 @@ class Article(models.Model):
     The Articles model class
     """
 
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, blank=True)
     slug = models.SlugField(unique=True,max_length=255,blank=True)
-    description = models.CharField(max_length=500)
+    description = models.CharField(max_length=500, blank=True)
     body = models.TextField()
     tagList = models.CharField(max_length=2000,blank=True)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now_add=True)
     favorited = models.BooleanField(default=False)
     favoritesCount = models.IntegerField(default=0)
+    rating = models.FloatField(default=0)
+    ratingsCount = models.IntegerField(default=0)
     author = models.ForeignKey(User,on_delete=models.CASCADE)
 
     
@@ -30,7 +32,7 @@ class Article(models.Model):
         if not self.slug:
             self.slug = self.generate_slug()
 
-            super(Article,self).save(*args , **kwargs)
+        super(Article,self).save(*args , **kwargs)
 
     def generate_slug(self):
         """
@@ -70,6 +72,10 @@ class Article(models.Model):
     @staticmethod
     def get_article(slug):
         return Article.objects.filter(slug=slug).first()
+    
+    @staticmethod
+    def get_single_article(slug):
+        return Article.objects.filter(slug=slug)
 
     @staticmethod
     def get_article_by_author(author_id,slug):
@@ -162,6 +168,17 @@ class Article(models.Model):
 
         return formatted_data
 
+    @staticmethod
+    def calculate_rating(current_rating, current_rating_count, user_rating):
+        """
+        This method calculates the average rating considering the current
+        average rating, the new user rating and the number of people who
+        have rated it
+        """
+        numerator = (current_rating * current_rating_count) + user_rating
+        current_rating_count += 1
+        rating = numerator / current_rating_count
+        return {"rating": rating, "ratingsCount": current_rating_count}
 
     def __str__(self):
         return self.title

@@ -18,12 +18,23 @@ class ArticlesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = ("slug","title", "description", "body",
-         "tagList","createdAt","updatedAt","favorited","favoritesCount", "author")
+         "tagList","createdAt","updatedAt","favorited","favoritesCount", "rating", "ratingsCount", "author")
 
     @staticmethod
     def convert_tagList_to_str(request_data={}):
         modified_data = request_data
         if modified_data.get('tagList', None):
            modified_data['tagList'] = str(request_data['tagList'])
+           
         return modified_data
+    
+    def update(self, instance, validated_data):
+        """
+        This method assigns the data in `validated_data` to
+        the instance of the Article.
+        """
+        for (key, value) in validated_data.items():
+            setattr(instance, key, value)
+        instance.save()
 
+        return instance
