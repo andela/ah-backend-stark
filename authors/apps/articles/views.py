@@ -1,7 +1,9 @@
 from rest_framework import status,serializers,exceptions
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.generics import UpdateAPIView
+
 
 from .renderers import ArticleJSONRenderer
 from .serializers import ArticlesSerializer
@@ -68,6 +70,68 @@ class GetSingleArticleAPIView(APIView):
         # returns (statusMessage, httpCode)
         status = Article.delete_article(user.id,slug)
         return Response({'message':status[0]},status[1])
+    
+
+class RateArticleAPIView(APIView):
+    """
+    This class contains the views regarding the article
+    rating feature
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ArticlesSerializer
+
+    def get_values(self, queryset):
+        """
+        This method takes in the article queryset and 
+        returns a dictionary of the article's data
+        """
+        return queryset.values()[0]
+    
+    def validate_rating(self, rating):
+        if rating not in list(range(1, 6)):
+            raise exceptions.ParseError(
+                "Sorry, only a rating in the 1-5 range can be given."
+            )
+    
+    def put(self, request, slug):
+        """
+        This method rates an article and saves the updated
+        rating and ratingsCount in the database
+        """
+        queryset = Article.objects.filter(slug=slug)
+        article = self.get_values(queryset)
+
+        if not queryset:
+            raise exceptions.NotFound(
+                'The selected article was not found.')
+        elif article.get("author_id") == get_user_from_auth(request).id:
+            raise exceptions.ParseError(
+                "Sorry, you cannot rate your own article."
+            )
+
+        serializer_instance = queryset.first()
+        serializer_data = request.data.get('article', {})
+        self.validate_rating(serializer_data.get("rating"))
+
+        current_rating = article['rating']
+        current_rating_count = article['ratingsCount']
+        user_rating = serializer_data.get('rating')
+        new_rating = Article.calculate_rating(
+                            current_rating, 
+                            current_rating_count, 
+                            user_rating)
+
+        serializer_data["rating"] = new_rating["rating"]
+        serializer_data["ratingsCount"] = new_rating["ratingsCount"]
+        serializer = self.serializer_class(
+            serializer_instance,
+            data=serializer_data,
+            partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response({"article": serializer.data}, status=status.HTTP_202_ACCEPTED)
 
 def get_user_from_auth(request):
     """

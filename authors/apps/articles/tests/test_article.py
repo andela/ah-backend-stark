@@ -82,7 +82,55 @@ class TestArticle(BaseTest):
         self.assertEqual(data.get('title'),"Modified title")
         self.assertEqual(data.get('description'),"The description is also different")
 
+    def test_rating_an_article(self):
+        self.mock_login()
+        self.client.post("/api/articles/", self.article_1, format="json")
+        self.different_user_mock_login()
+        rating_response = self.client.put('/api/articles/titlely/rate_article/', self.article_rating_4, format="json")
+        get_response = self.client.get('/api/articles/titlely')
+        data = get_response.data.get('article')
 
+        self.assertEqual(rating_response.status_code, status.HTTP_202_ACCEPTED)
+        self.assertEqual(get_response.status_code,status.HTTP_200_OK)
+        self.assertEqual(data.get('rating'), 4)
+        self.assertEqual(data.get('ratingsCount'), 1)
+    
+    def test_rating_score_is_average_of_all_ratings(self):
+        self.mock_login()
+        self.client.post("/api/articles/", self.article_1, format="json")
+        self.different_user_mock_login()
+        rating_response_1 = self.client.put('/api/articles/titlely/rate_article/', self.article_rating_4, format="json")
+        rating_response_2 = self.client.put('/api/articles/titlely/rate_article/', self.article_rating_5, format="json")
+        get_response = self.client.get('/api/articles/titlely')
+        data = get_response.data.get('article')
 
+        self.assertEqual(rating_response_1.status_code, status.HTTP_202_ACCEPTED)
+        self.assertEqual(rating_response_2.status_code, status.HTTP_202_ACCEPTED)
+        self.assertEqual(get_response.status_code,status.HTTP_200_OK)
+        self.assertEqual(data.get('rating'), 4.5)
+        self.assertEqual(data.get('ratingsCount'), 2)
         
+    def test_user_rates_own_article(self):
+        self.mock_login()
+        self.client.post("/api/articles/", self.article_1, format="json")
+        rating_response = self.client.put('/api/articles/titlely/rate_article/', self.article_rating_4, format="json")
+        get_response = self.client.get('/api/articles/titlely')
+        data = get_response.data.get('article')
 
+        self.assertEqual(rating_response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(get_response.status_code,status.HTTP_200_OK)
+        self.assertEqual(data.get('rating'), 0)
+        self.assertEqual(data.get('ratingsCount'), 0)
+    
+    def test_user_rating_out_of_range(self):
+        self.mock_login()
+        self.client.post("/api/articles/", self.article_1, format="json")
+        self.different_user_mock_login()
+        rating_response = self.client.put('/api/articles/titlely/rate_article/', self.article_rating_6, format="json")
+        get_response = self.client.get('/api/articles/titlely')
+        data = get_response.data.get('article')
+
+        self.assertEqual(rating_response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(get_response.status_code,status.HTTP_200_OK)
+        self.assertEqual(data.get('rating'), 0)
+        self.assertEqual(data.get('ratingsCount'), 0)
