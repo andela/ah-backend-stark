@@ -1,8 +1,10 @@
 from django.contrib.auth import authenticate
 
 from rest_framework import serializers
+from django.shortcuts import get_object_or_404
 
 from .models import User
+from .utils_ import sendMail
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -142,4 +144,32 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+class ResetPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField(allow_blank=False)
+
+    def validate(self, data):
+        """ this method validates the user email"""
+        email = data.get('email', None)
+        if email is None:
+            raise serializers.ValidationError(
+                'An email address is required to log in.'
+            )
+        # check if the user exist in the database
+        user = get_object_or_404(User, email=email)
+        if user is None:
+            raise serializers.ValidationError(
+                'there is something wrong with your email'
+            )
+
+        recipient = user.email
+        title = "Reset your Password"
+        token = user.token()
+        url = "http://127.0.0.1:8000/api/password-reset/"
+        body = " follow this link to reset your password  {}{}/".format(url, token)
+        sendMail(recipient, title, body)
+
+        return {
+            'email': user,
+        }
 
