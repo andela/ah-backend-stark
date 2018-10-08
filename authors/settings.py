@@ -170,3 +170,12 @@ if os.getenv('PRODUCTION', None):
 #     '--with-coverage',
 #     '--cover-package=authors',
 # ]
+
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST_USER = 'ah-stark'
+EMAIL_HOST_PASSWORD = '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'
+EMAIL_PORT = 587
+EMAIL_USE_TSL = True
+DEFAULT_FROM_EMAIL = 'authors.haven.stark@gmail.com'
+ACCOUNT_EMAIL_SUBJECT_PREFIX = 'Confirm Authors Haven Account'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

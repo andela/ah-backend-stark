@@ -86,6 +86,11 @@ class BaseTest(TestCase):
             "bio":"test",
             "location":"mbuya"}
                             }
+        self.password_update ={
+                "user":{
+                        "password": "12345678"
+                    }
+                }
         User.objects.create_user("test5", "test5@test.com", password="12345678")
         self.user = User.objects.get(email="test5@test.com")
         self.user.is_active = True
