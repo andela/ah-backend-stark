@@ -3,6 +3,7 @@
 from rest_framework import status
 from authors.apps.authentication.tests import BaseTest
 from authors.apps.authentication.models import User
+from rest_framework.test import APIClient
 
 class TestUser(BaseTest):
     """This class tests activities concerning user model"""
@@ -79,3 +80,39 @@ class TestUser(BaseTest):
         response = self.client.post("/api/users/", self.non_alphanumeric_password, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('Password should only contain numbers and letters', response.json()['errors']['password'])
+
+    def test_reset_user_password_status_code_returns_200(self):
+        self.client.post("/api/users/", self.reg_data, format="json")
+        self.client.post("/api/users/login/", self.login_data, format="json")
+        response = self.client.post("/api/password-reset/",
+                                    data={"user": {
+                                            "email":"test@test.com",
+                                            }
+                                        }, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_confirm_reset_user_password_status_code(self):
+        response = self.client.get(
+            "/api/password-reset/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9"
+            ".eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsImV4cCI6MTUzODU2OTI4M"
+            "30.PP8TfDmrEA5oDXLkoePqw5zS9Bw6nzhtJVLhWm76GUc"
+            "/",
+            format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+    def test_confirm_reset_without_token_status_code(self):
+        client = APIClient()
+        response = client.put("/api/password/reset/done/")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        assert "detail" in response.data
+
+    def test_confirm_reset(self):
+        """"This method tests creating a new user"""
+        client = APIClient()
+        token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9"
+        ".eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsImV4cCI6MTUzODU2OTI4M"
+        "30.PP8TfDmrEA5oDXLkoePqw5zS9Bw6nzhtJVLhWm76GUc"
+        client.credentials(HTTP_TOKEN=token)
+        response = self.client.put("/api/password/reset/done/", data=self.password_update, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

@@ -1,5 +1,5 @@
 from rest_framework import status
-from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, UpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -7,7 +7,8 @@ from .validation import validate
 
 from .renderers import UserJSONRenderer
 from .serializers import (
-    LoginSerializer, RegistrationSerializer, UserSerializer
+    LoginSerializer, RegistrationSerializer, UserSerializer,
+    ResetPasswordSerializer 
 )
 
 class RegistrationAPIView(APIView):
@@ -74,3 +75,41 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class ResetPasswordView(RetrieveUpdateAPIView):
+    permission_classes = (AllowAny,)
+    renderer_classes = (UserJSONRenderer,)
+    serializer_class = ResetPasswordSerializer
+
+    def post(self, request):
+        user = request.data.get('user', {})
+        serializer = self.serializer_class(data=user)
+        serializer.is_valid(raise_exception=True)
+        data = {
+            "message": " A link has been sent to your email"
+        }
+        return Response(data,
+                        status=status.HTTP_200_OK)
+
+    def retrieve(self, request, token, *args, **kwargs):
+        """this allows one to retrive the token from the end point
+        """
+        msg = {'message': 'a link has been sent to your email', 'token': token}
+        return Response(msg, status=status.HTTP_200_OK)
+
+
+class ChangePasswordView(UpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (UserJSONRenderer,)
+    serializer_class = UserSerializer
+
+    def update(self, request, *args, **kwargs):
+        serializer_data = request.data.get('user', {})
+        # Here is that serialize, validate, save pattern we talked about
+        # before.
+        serializer = self.serializer_class(
+            request.user, data=serializer_data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        msg = {'message': 'Your password has been updated'}
+        return Response(msg, status=status.HTTP_200_OK)
