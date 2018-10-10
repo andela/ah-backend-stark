@@ -16,7 +16,6 @@ class UserProfile(RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
 
     def retrieve(self, request, username, *args, **kwargs):
-
         """ function to retrieve user profile information """
         try:
             profile = Profile.objects.select_related('user').get(
@@ -74,7 +73,6 @@ class ListProfiles(RetrieveAPIView):
     serializer_class = ProfileSerializer
 
     def retrieve(self, request, *args, **kwargs):
-
         """ function to retrieve user profile information """
 
         users = Profile.objects.all()
