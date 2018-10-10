@@ -207,3 +207,28 @@ class Likes(models.Model):
     action_by = models.ForeignKey(User, on_delete=models.CASCADE)
     action = models.BooleanField()
     action_at = models.DateTimeField(auto_now_add=True)
+
+
+class Comment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    body = models.TextField()
+    parent_comment = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['timestamp']
+
+    def __str__(self):
+        return str(self.user.username)
+
+    def __unicode__(self):
+        return str(self.user.username)
+
+    def children(self):
+        return Comment.objects.filter(parent_comment=self)
+
+    def is_parent(self):
+        if self.parent_comment is not None:
+            return False
+        return True

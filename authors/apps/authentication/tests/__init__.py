@@ -3,9 +3,7 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
 from authors.apps.authentication.models import User
-from authors.apps.articles.models import Article
-
-
+from authors.apps.articles.models import Article, Comment
 class BaseTest(TestCase):
     """authentication app basetest class"""
 
@@ -194,6 +192,10 @@ class BaseTest(TestCase):
             }
         }
 
+        self.comment1={"comment": {
+            "body": "something else"
+        }
+        }
         # Test the article model functions
         self.article = Article.objects.create(
             title="my title",
@@ -251,4 +253,11 @@ class BaseTest(TestCase):
 
         data = login_response.data
         token = data['token']
-        self.client.credentials(HTTP_TOKEN=token)
+        self.client.credentials(HTTP_TOKEN=token)      
+
+        self.comment = Comment.objects.create(user=self.user,
+                                                body="how about we try something new.",
+                                                article=self.article)
+        self.comment.save()
+        self.client.post('/api/articles/titlely/comments/',
+                        data=self.comment1, format="json")
