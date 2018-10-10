@@ -50,3 +50,32 @@ class LikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Likes
         fields = ("username", "action", "article")
+
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ("id", "user", "body", "article",
+                  "timestamp")
+
+
+class ChildCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ("id", "body", "timestamp")
+
+
+class CommentDetailSerializer(serializers.ModelSerializer):
+    replies = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Comment
+        fields = ("id", "user", "body", "article",
+                  "timestamp", "replies", "parent_comment")
+
+    @staticmethod
+    def get_replies(obj):
+        if obj.is_parent:
+            return ChildCommentSerializer(obj.children(), many=True).data
+        return None

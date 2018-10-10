@@ -65,3 +65,32 @@ class JWTAuthentication(authentication.BaseAuthentication):
             raise exceptions.AuthenticationFailed(msg)
 
         return user
+        if not user.is_verified:
+            msg = 'This user account is not verified. Check your email for activation link'
+            raise exceptions.AuthenticationFailed(msg)
+
+        return user, token
+
+    @staticmethod
+    def get_verification_credencials(request, token):
+        """
+            Try to authenticate the given credentials. If authentication is
+            successful, return the user and token. If not, throw an error.
+            """
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY)
+        except:
+            msg = 'The token is invalid'
+            raise exceptions.AuthenticationFailed(msg)
+
+        try:
+            user = User.objects.get(pk=payload['id'])
+        except User.DoesNotExist:
+            msg = 'This token does not belong to any user'
+            raise exceptions.AuthenticationFailed(msg)
+
+        if not user.is_active:
+            msg = 'This user has been deactivated.'
+            raise exceptions.AuthenticationFailed(msg)
+
+        return user, token

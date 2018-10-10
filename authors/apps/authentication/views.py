@@ -4,17 +4,17 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .backends import JWTAuthentication
 from .renderers import UserJSONRenderer
+from .send_email import send_mail
 from .serializers import (
     LoginSerializer, RegistrationSerializer, UserSerializer,
     ResetPasswordSerializer
 )
-from .serializers import (LoginSerializer, RegistrationSerializer,
-                          UserSerializer)
+from .serializers import (
+    ResetPasswordSerializer
+)
 from .validation import validate
-
-from .send_email import send_mail
-from .backends import JWTAuthentication
 
 
 class RegistrationAPIView(APIView):
