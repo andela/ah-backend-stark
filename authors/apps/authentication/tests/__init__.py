@@ -4,6 +4,8 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 from authors.apps.authentication.models import User
 from authors.apps.articles.models import Article, Comment
+
+
 class BaseTest(TestCase):
     """authentication app basetest class"""
 
@@ -25,8 +27,8 @@ class BaseTest(TestCase):
                 "email": "test6@test.com",
                 "is_active": "False",
                 "password": "testpassword"
-                }
-                              }
+            }
+        }
         self.reg_data2 = {
             "user": {
                 "username": "test7",
@@ -120,11 +122,7 @@ class BaseTest(TestCase):
             }
         }
 
-        self.password_update = {
-                "user": {
-                        "password": "Newpaswd1"
-                    }
-                }
+        self.password_update = {"user": {"password": "Newpaswd1"}}
         User.objects.create_user(
             "test5", "test5@test.com", password="Testpassword3")
         self.user = User.objects.get(email="test5@test.com")
@@ -162,45 +160,23 @@ class BaseTest(TestCase):
             }
         }
 
-        self.article_rating_4 = {
-            "article": {
-                "rating": 4
-            }
-        }
+        self.article_rating_4 = {"article": {"rating": 4}}
 
-        self.article_rating_5 = {
-            "article": {
-                "rating": 5
-            }
-        }
+        self.article_rating_5 = {"article": {"rating": 5}}
 
-        self.article_rating_6 = {
-            "article": {
-                "rating": 6
-            }
-        }
-        self.like_article = {
-            "like": {"action": 1}
-        }
-        self.dislike_article = {
-            "like": {"action": 0}
-        }
+        self.article_rating_6 = {"article": {"rating": 6}}
+        self.like_article = {"like": {"action": 1}}
+        self.dislike_article = {"like": {"action": 0}}
 
-        self.user_email = {
-            "user": {
-                "email": "test@test.com"
-            }
-        }
+        self.user_email = {"user": {"email": "test@test.com"}}
 
-        self.comment1={"comment": {
-            "body": "something else"
-        }
-        }
+        self.comment1 = {"comment": {"body": "something else"}}
         # Test the article model functions
         self.article = Article.objects.create(
             title="my title",
             description='my description',
-            body='my body', author=self.user)
+            body='my body',
+            author=self.user)
 
         self.article.save()
         # update the article
@@ -223,11 +199,9 @@ class BaseTest(TestCase):
 
         It helps in authenticating requests
         """
-        res = self.client.post(
-            "/api/users/", self.reg_data, format="json")
+        res = self.client.post("/api/users/", self.reg_data, format="json")
         token = res.data['token']
-        self.client.get(
-            "/api/users/activate_account/{}/".format(token))
+        self.client.get("/api/users/activate_account/{}/".format(token))
         login_response = self.client.post(
             "/api/users/login/", self.login_data, format="json")
 
@@ -243,21 +217,22 @@ class BaseTest(TestCase):
 
         It helps in authenticating requests
         """
-        res = self.client.post(
-            "/api/users/", self.reg_data2, format="json")
+        res = self.client.post("/api/users/", self.reg_data2, format="json")
         token = res.data['token']
-        self.client.get(
-            "/api/users/activate_account/{}/".format(token))
+        self.client.get("/api/users/activate_account/{}/".format(token))
         login_response = self.client.post(
             "/api/users/login/", self.login_data2, format="json")
 
         data = login_response.data
         token = data['token']
-        self.client.credentials(HTTP_TOKEN=token)      
+        self.client.credentials(HTTP_TOKEN=token)
 
-        self.comment = Comment.objects.create(user=self.user,
-                                                body="how about we try something new.",
-                                                article=self.article)
+        self.comment = Comment.objects.create(
+            user=self.user,
+            body="how about we try something new.",
+            article=self.article)
         self.comment.save()
-        self.client.post('/api/articles/titlely/comments/',
-                        data=self.comment1, format="json")
+        self.client.post(
+            '/api/articles/titlely/comments/',
+            data=self.comment1,
+            format="json")

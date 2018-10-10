@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Article, Likes
+from .models import Article, Likes, Comment
 from authors.apps.authentication.backends import JWTAuthentication
 from ast import literal_eval
 
@@ -50,7 +50,6 @@ class LikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Likes
         fields = ("username", "action", "article")
-
 
 
 class CommentSerializer(serializers.ModelSerializer):

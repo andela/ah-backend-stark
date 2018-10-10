@@ -1,5 +1,4 @@
-import rest_framework
-
+from rest_framework import status
 from authors.apps.authentication.tests import BaseTest
 
 
@@ -213,7 +212,7 @@ class TestArticle(BaseTest):
         self.mock_login()
         self.client.post(
             "/api/articles/", self.article_1, format="json")
-        response = self.client.post(
+        self.client.post(
             "/api/articles/titlely/like/", self.like_article, format="json")
         response1 = self.client.post(
             '/api/articles/titlely/like/', self.dislike_article, format="json")
@@ -224,15 +223,16 @@ class TestArticle(BaseTest):
         """This method tests for updating liking an article"""
         self.mock_login()
         self.client.post("/api/articles/", self.article_1, format="json")
-        response1 = self.client.put('/api/articles/titlely/like/', self.dislike_article, format="json")
-        self.assertEqual(response1.status_code, rest_framework.status.HTTP_400_BAD_REQUEST)
+        response1 = self.client.put(
+            '/api/articles/titlely/like/', self.dislike_article, format="json")
+        self.assertEqual(response1.status_code, status.HTTP_400_BAD_REQUEST)
         assert "errors" in response1.data
 
     def test_get_comments_status_code(self):
         self.mock_login()
         self.client.post('/api/articles/', self.article_1, format="json")
         response = self.client.get('/api/articles/titlely/comments/')
-        self.assertEqual(response.status_code, rest_framework.status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_post_comments_status_code(self):
         self.mock_login()
@@ -242,7 +242,7 @@ class TestArticle(BaseTest):
                                         "body": "something else"
                                     }
                                     }, format="json")
-        self.assertEqual(response.status_code, rest_framework.status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_post_child_comments_status_code(self):
         self.mock_login()
@@ -254,4 +254,4 @@ class TestArticle(BaseTest):
                                         "body": "something else"
                                     }
                                     }, format="json")
-        self.assertEqual(response.status_code, rest_framework.status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)

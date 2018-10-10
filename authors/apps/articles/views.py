@@ -1,9 +1,13 @@
 from rest_framework import status, serializers, exceptions
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.permissions import (
+    IsAuthenticatedOrReadOnly, IsAuthenticated
+)
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
-from rest_framework.generics import UpdateAPIView, CreateAPIView, UpdateAPIView
+from rest_framework.generics import (
+    UpdateAPIView, CreateAPIView, UpdateAPIView
+)
 
 from .renderers import ArticleJSONRenderer, LikesJSONRenderer
 from .serializers import (
@@ -13,7 +17,6 @@ from .serializers import (
 from .models import Article, Comment, Likes
 from authors.apps.authentication.backends import JWTAuthentication
 from django.shortcuts import get_object_or_404
-
 
 
 class ArticleCreationAPIView(APIView):
@@ -38,11 +41,12 @@ class ArticleCreationAPIView(APIView):
         article = ArticlesSerializer.convert_tagList_to_str(article)
         serializer = self.serializer_class(data=article)
         serializer.is_valid(raise_exception=True)
-        save_status = serializer.save()
+        serializer.save()
 
         res_data = Article.format_data_for_display(serializer.data)
 
         return Response(res_data, status=status.HTTP_201_CREATED)
+
 
 class GetSingleArticleAPIView(APIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
@@ -124,9 +128,9 @@ class RateArticleAPIView(APIView):
         current_rating_count = article['ratingsCount']
         user_rating = serializer_data.get('rating')
         new_rating = Article.calculate_rating(
-                            current_rating,
-                            current_rating_count,
-                            user_rating)
+            current_rating,
+            current_rating_count,
+            user_rating)
 
         serializer_data["rating"] = new_rating["rating"]
         serializer_data["ratingsCount"] = new_rating["ratingsCount"]
@@ -141,7 +145,6 @@ class RateArticleAPIView(APIView):
         return Response(
             {"article": serializer.data},
             status=status.HTTP_202_ACCEPTED)
-
 
 
 def get_user_from_auth(request):
@@ -179,14 +182,17 @@ class LikeView(CreateAPIView, UpdateAPIView):
         article1 = self.kwargs["slug"]
         article = get_object_or_404(Article, slug=article1)
         try:
-            instance = Likes.objects.get(action_by=request.user.id, article=article.id)
+            instance = Likes.objects.get(action_by=request.user.id,
+                                         article=article.id)
             action = request.data.get('like', {})
-            serializer = self.serializer_class(instance, data=action, partial=True)
+            serializer = self.serializer_class(instance,
+                                               data=action, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
-        except:
-            raise serializers.ValidationError('cannot update like or dislike article', 400)
+        except Exception:
+            raise serializers.ValidationError('cannot update'
+                                              'like or dislike article', 400)
 
 
 class PostCommentApiView(APIView):
@@ -208,7 +214,7 @@ class PostCommentApiView(APIView):
         comment["article"] = instance.id
         serializer = self.serializer_class(data=comment)
         serializer.is_valid(raise_exception=True)
-        save_status = serializer.save()
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -239,7 +245,7 @@ class CommentDetailApiView(APIView):
         comment["parent_comment"] = id
         serializer = self.serializer_class(data=comment)
         serializer.is_valid(raise_exception=True)
-        save_status = serializer.save()
+        serializer.save()
         new_data = serializer.data
         new_comment = self.format_dictionary(new_data)
         return Response(new_comment, status=status.HTTP_201_CREATED)

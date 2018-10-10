@@ -128,13 +128,13 @@ class Article(models.Model):
             updated_time = timezone.now()
 
             article_queryset.update(
-                       title=new_title,
-                       slug=new_slug,
-                       description=new_description,
-                       body=new_body,
-                       tagList=new_tagList,
-                       image=new_image,
-                       updatedAt=updated_time)
+                title=new_title,
+                slug=new_slug,
+                description=new_description,
+                body=new_body,
+                tagList=new_tagList,
+                image=new_image,
+                updatedAt=updated_time)
 
             article = Article.get_article(new_slug)
             # return the modified article instead of the default message
@@ -212,7 +212,8 @@ class Likes(models.Model):
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     body = models.TextField()
-    parent_comment = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
+    parent_comment = models.ForeignKey(
+        'self', on_delete=models.CASCADE, blank=True, null=True)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
 

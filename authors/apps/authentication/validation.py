@@ -36,10 +36,10 @@ def validate(data):
     strong_password(password)
 
     return {
-            "username": username,
-            "email": email,
-            "password": password
-        }
+        "username": username,
+        "email": email,
+        "password": password
+    }
 
 
 def strong_password(password):
