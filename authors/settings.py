@@ -162,8 +162,6 @@ if os.getenv('PRODUCTION', None):
     # Activate django-heroku
     django_heroku.settings(locals(), test_runner=False)
 
-# # use nose to run all tests
-# TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 # # tell nose to measure coverage on the 'authors' app
 # NOSE_ARGS = [

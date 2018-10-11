@@ -41,11 +41,6 @@ class BaseTest(TestCase):
             "password":"testpassword"}
                            }
 
-        self.deactive_login = {"user": {
-            "email":"test6@test.com",
-            "password":"12345678"}
-                               }
-
         self.missing_username = {
             "user": {
                 "username":"",
@@ -86,14 +81,15 @@ class BaseTest(TestCase):
             "bio":"test",
             "location":"mbuya"}
                             }
+        self.password_update ={
+                "user":{
+                        "password": "12345678"
+                    }
+                }
         User.objects.create_user("test5", "test5@test.com", password="12345678")
         self.user = User.objects.get(email="test5@test.com")
         self.user.is_active = True
         self.user.save()
-
-        register_user2 = self.client.post("/api/users/", self.deactive_user, format="json")
-        token1 = register_user2.data["token"]
-        self.client.credentials(HTTP_TOKEN=token1)
 
         self.article_1 = {"article": {
             "title": "Titlely",
@@ -136,6 +132,19 @@ class BaseTest(TestCase):
             "rating": 6
                 }
         }
+        self.like_article = {"like":{
+	        "action":1
+                }
+        }
+        self.dislike_article = {"like":{
+	        "action":0
+                }
+        }
+
+        self.user_email = {"user": {
+            "email":"test@test.com"
+                    }
+        }
 
         # Test the article model functions
         self.article = Article.objects.create(title="my title",
@@ -162,7 +171,9 @@ class BaseTest(TestCase):
 
         It helps in authenticating requests
         """
-        self.client.post("/api/users/", self.reg_data, format="json")
+        res = self.client.post("/api/users/", self.reg_data, format="json")
+        token = res.data['token']
+        self.client.get("/api/users/activate_account/{}/".format(token))
         login_response = self.client.post("/api/users/login/",
                          self.login_data, format="json")
 
@@ -178,7 +189,9 @@ class BaseTest(TestCase):
 
         It helps in authenticating requests
         """
-        self.client.post("/api/users/", self.reg_data2, format="json")
+        res = self.client.post("/api/users/", self.reg_data2, format="json")
+        token = res.data['token']
+        self.client.get("/api/users/activate_account/{}/".format(token))
         login_response = self.client.post("/api/users/login/",
                          self.login_data2, format="json")
 

@@ -10,11 +10,11 @@ class Article(models.Model):
     The Articles model class
     """
 
-    title = models.CharField(max_length=255, blank=True)
-    slug = models.SlugField(unique=True,max_length=255,blank=True)
-    description = models.CharField(max_length=500, blank=True)
+    title = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True, max_length=255, blank=True)
+    description = models.CharField(max_length=500)
     body = models.TextField()
-    tagList = models.CharField(max_length=2000,blank=True)
+    tagList = models.CharField(max_length=2000, blank=True)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now_add=True)
     favorited = models.BooleanField(default=False)
@@ -182,5 +182,24 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
+
+    def count_likes_or_dislikes(self, action):
+        likes = Likes.objects.all().filter(article_id=self.id, action = action).count()
+        return likes
+
+    def likes(self):
+        likes = self.count_likes_or_dislikes(True)
+        return likes
+
+    def dislikes(self):
+        dislikes = self.count_likes_or_dislikes(False)
+        return dislikes
+
+
+class Likes(models.Model):
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    action_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    action  = models.BooleanField()
+    action_at = models.DateTimeField(auto_now_add=True)       
 
 

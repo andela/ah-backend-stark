@@ -1,8 +1,10 @@
 from django.contrib.auth import authenticate
 
 from rest_framework import serializers
+from django.shortcuts import get_object_or_404
 
 from .models import User
+from .utils_ import sendMail
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -20,7 +22,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         model = User
         # List all of the fields that could possibly be included in a request
         # or response, including fields specified explicitly above.
-        fields = ['email', 'username', 'password','token','complete_profile']
+        fields = ['email', 'username', 'password','token']
 
     def create(self, validated_data):
         # Use the `create_user` method we wrote earlier to create a new user.
@@ -77,6 +79,11 @@ class LoginSerializer(serializers.Serializer):
         if not user.is_active:
             raise serializers.ValidationError(
                 'This user has been deactivated.'
+            )
+
+        if not user.is_verified:
+            raise serializers.ValidationError(
+                'Account activation required before login'
             )
 
         # The `validate` method should return a dictionary of validated data.
@@ -143,3 +150,34 @@ class UserSerializer(serializers.ModelSerializer):
 
         return instance
 
+
+class ResetPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField(allow_blank=False)
+    token = serializers.CharField(read_only=True, max_length=255)
+    message = serializers.CharField(max_length=255, read_only=True)
+
+    def validate(self, data):
+        """ this method validates the user email"""
+        email = data.get('email', None)
+        if email is None:
+            raise serializers.ValidationError(
+                'An email address is required to log in.'
+            )
+        # check if the user exist in the database
+        user = get_object_or_404(User, email=email)
+        if user is None:
+            raise serializers.ValidationError(
+                'there is something wrong with your email'
+            )
+
+        recipient = user.email
+        title = "Reset your Password"
+        token = user.token()
+        url = "http://127.0.0.1:8000/api/password-reset/"
+        body = " follow this link to reset your password  {}{}/".format(url, token)
+        sendMail(recipient, title, body)
+        return {
+            'email': email,
+            'token': token,
+            'message': 'A link has been sent to your email'
+        }
