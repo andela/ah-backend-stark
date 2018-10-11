@@ -10,11 +10,11 @@ class Article(models.Model):
     The Articles model class
     """
 
-    title = models.CharField(max_length=255, blank=True)
-    slug = models.SlugField(unique=True,max_length=255,blank=True)
-    description = models.CharField(max_length=500, blank=True)
+    title = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True, max_length=255, blank=True)
+    description = models.CharField(max_length=500)
     body = models.TextField()
-    tagList = models.CharField(max_length=2000,blank=True)
+    tagList = models.CharField(max_length=2000, blank=True)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now_add=True)
     favorited = models.BooleanField(default=False)
