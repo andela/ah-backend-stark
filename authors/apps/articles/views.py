@@ -86,13 +86,13 @@ class RateArticleAPIView(APIView):
         returns a dictionary of the article's data
         """
         return queryset.values()[0]
-    
+
     def validate_rating(self, rating):
         if rating not in list(range(1, 6)):
             raise exceptions.ParseError(
                 "Sorry, only a rating in the 1-5 range can be given."
             )
-    
+
     def put(self, request, slug):
         """
         This method rates an article and saves the updated

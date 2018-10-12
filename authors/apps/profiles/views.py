@@ -1,5 +1,5 @@
 """views for profile app"""
-from rest_framework import status
+from rest_framework import status, exceptions
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -7,6 +7,8 @@ from .models import Profile
 from .renderers import ProfileJSONRenderer
 from .serializers import ProfileSerializer
 from .exceptions import ProfileDoesNotExist
+
+# from authors.apps.articles.views import get_user_from_auth
 
 
 class UserProfile(RetrieveUpdateAPIView):
@@ -56,3 +58,43 @@ class UserProfile(RetrieveUpdateAPIView):
                             status.HTTP_400_BAD_REQUEST)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UserFollowing(RetrieveUpdateAPIView):
+    """Profile views class"""
+    permission_classes = (IsAuthenticated,)
+    # renderer_classes = (ProfileJSONRenderer,)
+    serializer_class = ProfileSerializer
+
+    def follow_user(request, username):
+        following_id = username
+        user_id = request.user.id
+        if check_following(user_id, follower_id):
+            message = "You're already following this user."
+            status = status.HTTP_200_OK
+            return (message, status)
+        else:
+            serializer_instance = 
+            serializer_data = {
+                        "user_id" = 
+                        "follower_id" = follower_id
+            }
+            serializer = self.serializer_class
+
+        pass
+    
+    def unfollow_user(username):
+        pass
+    
+    def retrieve(self, request, username):
+        pass
+
+    def update(self, request, username, follow, *args, **kwargs):
+        if follow == "follow":
+            follow_user(request, username)
+        elif follow == "unfollow":
+            unfollow_user(username)
+        else:
+            raise exceptions.NotFound(
+                "Sorry, page not found."
+            )
