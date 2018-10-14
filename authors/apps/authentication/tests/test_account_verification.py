@@ -14,9 +14,11 @@ class TestVerification(BaseTest):
         link is sent to a user upon registration
         """
 
-        response = self.client.post("/api/users/", self.reg_data, format="json")
+        response = self.client.post(
+            "/api/users/", self.reg_data, format="json")
         self.assertIn(
-            'User successfully registered. Check your email to activate account', 
+            'User successfully registered. '+ 
+            'Check your email to activate account', 
             response.json()['user']['message']
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -29,7 +31,8 @@ class TestVerification(BaseTest):
 
         res = self.client.post("/api/users/", self.reg_data, format="json")
         token = res.data['token']
-        response = self.client.get("/api/users/activate_account/{}/".format(token))
+        response = self.client.get(
+            "/api/users/activate_account/{}/".format(token))
         self.assertIn(
             'Your account has been successfully activated. Complete profile', 
             response.json()['user']['message']
@@ -43,8 +46,11 @@ class TestVerification(BaseTest):
         """
 
         self.token = 'token'
-        response = self.client.get("/api/users/activate_account/{}/".format(self.token))
-        self.assertIn('Sorry. Activation link either expired or is invalid', response.json()['user']['message'])
+        response = self.client.get(
+            "/api/users/activate_account/{}/".format(self.token))
+        self.assertIn(
+            'Sorry. Activation link either expired or is invalid', 
+            response.json()['user']['message'])
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         
     def test_account_already_activated(self):
