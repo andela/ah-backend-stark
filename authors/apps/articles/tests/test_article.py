@@ -133,3 +133,41 @@ class TestArticle(BaseTest):
         self.assertEqual(get_response.status_code,status.HTTP_200_OK)
         self.assertEqual(data.get('rating'), 0)
         self.assertEqual(data.get('ratingsCount'), 0)
+
+    def test_liking_articles(self):
+        """This method tests for liking an article"""
+        self.mock_login()
+        self.client.post("/api/articles/", self.article_1, format="json")
+        response = self.client.post("/api/articles/titlely/like/", self.like_article, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        assert "username" in response.data
+        assert "action" in response.data
+        assert "article" in response.data 
+
+    def test_updating_disliking_articles(self):
+        """This method tests for updating liking an article"""
+        self.mock_login()
+        self.client.post("/api/articles/", self.article_1, format="json")
+        response = self.client.post("/api/articles/titlely/like/", self.like_article, format="json")
+        response = self.client.put('/api/articles/titlely/like/', self.dislike_article, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert "username" in response.data
+        assert "action" in response.data
+        assert "article" in response.data
+
+    def test_liking_article_twice(self):
+        """This method tests for updating liking an article"""
+        self.mock_login()
+        self.client.post("/api/articles/", self.article_1, format="json")
+        response = self.client.post("/api/articles/titlely/like/", self.like_article, format="json")
+        response1 = self.client.post('/api/articles/titlely/like/', self.dislike_article, format="json")
+        self.assertEqual(response1.status_code, status.HTTP_400_BAD_REQUEST)
+        assert "errors" in response1.data
+
+    def test_updating_liking_article_without_liking_first(self):
+        """This method tests for updating liking an article"""
+        self.mock_login()
+        self.client.post("/api/articles/", self.article_1, format="json")
+        response1 = self.client.put('/api/articles/titlely/like/', self.dislike_article, format="json")
+        self.assertEqual(response1.status_code, status.HTTP_400_BAD_REQUEST)
+        assert "errors" in response1.data             

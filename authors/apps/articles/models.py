@@ -183,4 +183,18 @@ class Article(models.Model):
     def __str__(self):
         return self.title
 
+    def likes(self):
+        likes = Likes.objects.all().filter(article_id=self.id, action = True).count()
+        return likes
+
+    def dislikes(self):
+        dislikes = Likes.objects.all().filter(article_id=self.id, action = False).count()
+        return dislikes    
+
+class Likes(models.Model):
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    action_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    action  = models.BooleanField()
+    action_at = models.DateTimeField(auto_now_add=True)       
+
 

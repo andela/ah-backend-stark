@@ -2,12 +2,13 @@ from rest_framework import status,serializers,exceptions
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.generics import UpdateAPIView
+from django.shortcuts import get_object_or_404
+from rest_framework.generics import UpdateAPIView,CreateAPIView, UpdateAPIView
 
 
-from .renderers import ArticleJSONRenderer
-from .serializers import ArticlesSerializer
-from .models import Article
+from .renderers import ArticleJSONRenderer,LikesJSONRenderer
+from .serializers import ArticlesSerializer,LikeSerializer
+from .models import Article,Likes
 from authors.apps.authentication.backends import JWTAuthentication
 
 class ArticleCreationAPIView(APIView):
@@ -141,3 +142,34 @@ def get_user_from_auth(request):
     auth = JWTAuthentication()
     user = auth.authenticate(request)[0]
     return user
+
+class LikeView(CreateAPIView, UpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (LikesJSONRenderer,)
+    serializer_class = LikeSerializer
+
+    def create(self, request, *args, **kwargs):
+        article=self.kwargs["slug"]
+        self.article1=get_object_or_404(Article, slug=article)
+        if Likes.objects.filter(action_by=request.user,article=self.article1).exists():
+            raise serializers.ValidationError('you can only like or dislike an article once',400)
+        else:    
+            action = request.data.get('like', {})
+            serializer=self.serializer_class(data=action)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(action_by=self.request.user, article=self.article1)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
+        article1=self.kwargs["slug"]
+        article= get_object_or_404(Article, slug=article1)
+        try :
+            instance = Likes.objects.get(action_by=request.user.id, article=article.id)
+            action = request.data.get('like', {})
+            serializer=self.serializer_class(instance, data=action, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            raise serializers.ValidationError('cannot update like or dislike article',400)
+            
