@@ -132,6 +132,14 @@ class BaseTest(TestCase):
             "rating": 6
                 }
         }
+        self.like_article = {"like":{
+	        "action":1
+                }
+        }
+        self.dislike_article = {"like":{
+	        "action":0
+                }
+        }
 
         self.user_email = {"user": {
             "email":"test@test.com"

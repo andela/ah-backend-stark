@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Article
+from .models import Article,Likes
 from authors.apps.authentication.backends import JWTAuthentication
 from ast import literal_eval
 
@@ -18,7 +18,7 @@ class ArticlesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = ("slug","title", "description", "body",
-         "tagList","createdAt","updatedAt","favorited","favoritesCount", "rating", "ratingsCount", "author")
+         "tagList","createdAt","updatedAt","favorited","favoritesCount", "rating", "ratingsCount", "author","likes", "dislikes")
 
     @staticmethod
     def convert_tagList_to_str(request_data={}):
@@ -38,3 +38,13 @@ class ArticlesSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+class LikeSerializer(serializers.ModelSerializer):
+    username = serializers.ReadOnlyField(source='action_by.username')
+    article = serializers.ReadOnlyField(source='article.slug')
+
+    class Meta:
+        model = Likes
+        fields=("username","action","article")   
+
+
