@@ -5,12 +5,13 @@ from django.conf import settings
 from rest_framework import authentication, exceptions
 from .models import User
 
-"""Configure JWT Here"""
+
 class JWTAuthentication(authentication.BaseAuthentication):
+    """Configure JWT Here"""
 
-    def authenticate(self,request):
+    def authenticate(self, request):
 
-        token = request.META.get('HTTP_TOKEN',None)
+        token = request.META.get('HTTP_TOKEN', None)
 
         if not token:
             return None
@@ -39,7 +40,8 @@ class JWTAuthentication(authentication.BaseAuthentication):
             raise exceptions.AuthenticationFailed(msg)
 
         if not user.is_verified:
-            msg = 'This user account is not verified. Check your email for activation link'
+            msg = ('This user account is not verified. \
+            Check your email for activation link')
             raise exceptions.AuthenticationFailed(msg)
 
         return (user, token)
@@ -66,4 +68,3 @@ class JWTAuthentication(authentication.BaseAuthentication):
                 raise exceptions.AuthenticationFailed(msg)
 
             return (user, token)
-

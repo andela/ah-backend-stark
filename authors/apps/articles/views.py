@@ -1,25 +1,28 @@
-from rest_framework import status,serializers,exceptions
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework import status, serializers, exceptions
+from rest_framework.permissions import (
+    IsAuthenticatedOrReadOnly, IsAuthenticated)
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
-from rest_framework.generics import UpdateAPIView,CreateAPIView, UpdateAPIView
+from rest_framework.generics import (
+    UpdateAPIView, CreateAPIView, UpdateAPIView)
 
 
-from .renderers import ArticleJSONRenderer,LikesJSONRenderer
-from .serializers import ArticlesSerializer,LikeSerializer
-from .models import Article,Likes
+from .renderers import ArticleJSONRenderer, LikesJSONRenderer
+from .serializers import ArticlesSerializer, LikeSerializer
+from .models import Article, Likes
 from authors.apps.authentication.backends import JWTAuthentication
+
 
 class ArticleCreationAPIView(APIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     serializer_class = ArticlesSerializer
 
-    def get(self,request):
+    def get(self, request):
         article = Article.objects.all()
-        serializer = self.serializer_class(article,many=True)
+        serializer = self.serializer_class(article, many=True)
         res_data = Article.format_data_for_display(serializer.data)
-        return Response({"articles":res_data},status.HTTP_200_OK)
+        return Response({"articles": res_data}, status.HTTP_200_OK)
 
     def post(self, request):
         article = request.data.get('article')
@@ -27,51 +30,52 @@ class ArticleCreationAPIView(APIView):
         article['author'] = user.id
 
         if Article.title_exists(user.id, article['title']):
-            raise serializers.ValidationError('You already have an article with the same title',409)
-        
+            raise serializers.ValidationError(
+                'You already have an article with the same title', 409)
+
         article = ArticlesSerializer.convert_tagList_to_str(article)
         serializer = self.serializer_class(data=article)
         serializer.is_valid(raise_exception=True)
         save_status = serializer.save()
 
         res_data = Article.format_data_for_display(serializer.data)
-    
         return Response(res_data, status=status.HTTP_201_CREATED)
-
 
 
 class GetSingleArticleAPIView(APIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     renderer_classes = (ArticleJSONRenderer,)
     serializer_class = ArticlesSerializer
-    def get(self,request,slug):
+
+    def get(self, request, slug):
         article = Article.get_article(slug)
-      
+
         if not article:
-            raise exceptions.NotFound('The selected article was not found.')
+            raise exceptions.NotFound(
+                'The selected article was not found.')
 
         serializer = self.serializer_class(article)
         res_data = Article.format_data_for_display(serializer.data)
-        return Response({"article":res_data}, status.HTTP_200_OK)
+        return Response({"article": res_data}, status.HTTP_200_OK)
 
-    def put(self,request,slug):
+    def put(self, request, slug):
         user = get_user_from_auth(request)
         new_article = request.data.get('article')
-        status = Article.update_article(user.id,slug,new_article)
+        status = Article.update_article(user.id, slug, new_article)
 
         if status[1] == 202:
             serializer = self.serializer_class(status[0])
             res_data = Article.format_data_for_display(serializer.data)
             return Response(res_data, 202)
 
-        return Response({'message':status[0]},status[1])
-        
-    def delete(self,request,slug):
+        return Response({'message': status[0]}, status[1])
+
+    def delete(self, request, slug):
         user = get_user_from_auth(request)
         # returns (statusMessage, httpCode)
-        status = Article.delete_article(user.id,slug)
-        return Response({'message':status[0]},status[1])
-    
+        status = Article.delete_article(user.id, slug)
+        return Response({'message': status[0]}, status[1])
+
 
 class RateArticleAPIView(APIView):
     """
@@ -83,17 +87,17 @@ class RateArticleAPIView(APIView):
 
     def get_values(self, queryset):
         """
-        This method takes in the article queryset and 
+        This method takes in the article queryset and
         returns a dictionary of the article's data
         """
         return queryset.values()[0]
-    
+
     def validate_rating(self, rating):
         if rating not in list(range(1, 6)):
             raise exceptions.ParseError(
                 "Sorry, only a rating in the 1-5 range can be given."
             )
-    
+
     def put(self, request, slug):
         """
         This method rates an article and saves the updated
@@ -118,8 +122,8 @@ class RateArticleAPIView(APIView):
         current_rating_count = article['ratingsCount']
         user_rating = serializer_data.get('rating')
         new_rating = Article.calculate_rating(
-                            current_rating, 
-                            current_rating_count, 
+                            current_rating,
+                            current_rating_count,
                             user_rating)
 
         serializer_data["rating"] = new_rating["rating"]
@@ -132,16 +136,20 @@ class RateArticleAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        return Response({"article": serializer.data}, status=status.HTTP_202_ACCEPTED)
+        return Response(
+            {"article": serializer.data},
+            status=status.HTTP_202_ACCEPTED)
+
 
 def get_user_from_auth(request):
     """
-    This helper function returns an instance of the authenticated user and their token
-    from the authentication class
+    This helper function returns an instance of the authenticated
+    user and their token from the authentication class
     """
     auth = JWTAuthentication()
     user = auth.authenticate(request)[0]
     return user
+
 
 class LikeView(CreateAPIView, UpdateAPIView):
     permission_classes = (IsAuthenticated,)
@@ -149,27 +157,34 @@ class LikeView(CreateAPIView, UpdateAPIView):
     serializer_class = LikeSerializer
 
     def create(self, request, *args, **kwargs):
-        article=self.kwargs["slug"]
-        self.article1=get_object_or_404(Article, slug=article)
-        if Likes.objects.filter(action_by=request.user,article=self.article1).exists():
-            raise serializers.ValidationError('you can only like or dislike an article once',400)
-        else:    
+        article = self.kwargs["slug"]
+        self.article1 = get_object_or_404(Article, slug=article)
+        if Likes.objects.filter(
+                action_by=request.user, article=self.article1).exists():
+            raise serializers.ValidationError(
+                'you can only like or dislike an article once', 400)
+        else:
             action = request.data.get('like', {})
-            serializer=self.serializer_class(data=action)
+            serializer = self.serializer_class(data=action)
             serializer.is_valid(raise_exception=True)
-            serializer.save(action_by=self.request.user, article=self.article1)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            serializer.save(
+                action_by=self.request.user, article=self.article1)
+            return Response(
+                serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
-        article1=self.kwargs["slug"]
-        article= get_object_or_404(Article, slug=article1)
-        try :
-            instance = Likes.objects.get(action_by=request.user.id, article=article.id)
+        article1 = self.kwargs["slug"]
+        article = get_object_or_404(Article, slug=article1)
+
+        try:
+            instance = Likes.objects.get(
+                action_by=request.user.id, article=article.id)
             action = request.data.get('like', {})
-            serializer=self.serializer_class(instance, data=action, partial=True)
+            serializer = self.serializer_class(
+                instance, data=action, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         except:
-            raise serializers.ValidationError('cannot update like or dislike article',400)
-            
+            raise serializers.ValidationError(
+                'cannot update like or dislike article', 400)

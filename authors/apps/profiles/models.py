@@ -4,7 +4,8 @@ from django.db import models
 
 class Profile(models.Model):
     """user profile model"""
-    user = models.OneToOneField('authentication.User', on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        'authentication.User', on_delete=models.CASCADE)
     bio = models.TextField(blank=True)
     image = models.URLField(blank=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -32,14 +32,18 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 STATIC_URL = '/static/'
 
-#Other places for collectstatic to find static files.
+# Other places for collectstatic to find static files.
 STATICFILES_DIRS = (
     os.path.join(PROJECT_ROOT, 'static'),
 )
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-ALLOWED_HOSTS = ['ah-backend-stark-staging.herokuapp.com', 'ah-backend-stark.herokuapp.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = [
+    'ah-backend-stark-staging.herokuapp.com',
+    'ah-backend-stark.herokuapp.com',
+    'localhost', '127.0.0.1'
+]
 
 # Application definition
 
@@ -98,7 +102,7 @@ WSGI_APPLICATION = 'authors.wsgi.application'
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
 DATABASES = {
-    'default':dj_database_url.parse(get_database_url())
+    'default': dj_database_url.parse(get_database_url())
 }
 
 
@@ -107,16 +111,20 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': 'django.contrib.auth.password_validation' +
+        '.UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': 'django.contrib.auth.password_validation' +
+        '.MinimumLengthValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation' +
+        '.CommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation' +
+        '.NumericPasswordValidator',
     },
 ]
 
@@ -155,16 +163,9 @@ REST_FRAMEWORK = {
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'authors.apps.authentication.backends.JWTAuthentication',
-    ), 
+    ),
 }
 if os.getenv('PRODUCTION', None):
     import django_heroku
     # Activate django-heroku
     django_heroku.settings(locals(), test_runner=False)
-
-
-# # tell nose to measure coverage on the 'authors' app
-# NOSE_ARGS = [
-#     '--with-coverage',
-#     '--cover-package=authors',
-# ]
