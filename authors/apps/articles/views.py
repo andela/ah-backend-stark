@@ -185,6 +185,7 @@ class LikeView(CreateAPIView, UpdateAPIView):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
-        except:
+
+        except Exception:
             raise serializers.ValidationError(
                 'cannot update like or dislike article', 400)

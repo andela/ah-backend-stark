@@ -159,7 +159,7 @@ class VerifyAccountAPIView(APIView, JWTAuthentication):
                 "message": "Account already activated. Please login"
             }, status=status.HTTP_200_OK)
 
-        except:
+        except Exception as e:
             return Response({
                 "message": "Sorry. Activation link " +
                 "either expired or is invalid"

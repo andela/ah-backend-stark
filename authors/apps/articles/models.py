@@ -50,7 +50,7 @@ class Article(models.Model):
 
             last_article = current_slug_queryset.last()
             last_slug_str = last_article.slug
-            last_digits_regx = "\d+$"
+            last_digits_regx = r"\d+$"
             slug_matches = re.search(last_digits_regx, last_slug_str)
 
             if slug_matches:

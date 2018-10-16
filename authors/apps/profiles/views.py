@@ -22,7 +22,7 @@ class UserProfile(RetrieveUpdateAPIView):
             profile = Profile.objects.select_related('user').get(
                 user__username=username)
 
-        except:
+        except Exception as e:
             raise ProfileDoesNotExist
 
         serializer = self.serializer_class(profile)
@@ -55,7 +55,7 @@ class UserProfile(RetrieveUpdateAPIView):
 
             try:
                 serializer.update(request.user, serializer_data)
-            except:
+            except Exception as e:
                 return Response(
                     {"error": "Username or email already exist, " +
                         "create a unique one"},

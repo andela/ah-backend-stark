@@ -9,4 +9,5 @@ class AuthenticateAppConfig(AppConfig):
     def ready(self):
         import authors.apps.authentication.signals
 
+
 default_app_config = 'authors.apps.authentication.AuthenticateAppConfig'
