@@ -25,8 +25,8 @@ class TestArticle(BaseTest):
         response = self.client.get('/api/articles/')
         data = response.data
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('articles' in data)
-        self.assertIsInstance(data.get('articles'), list)
+        self.assertTrue('results' in data)
+        self.assertIsInstance(data.get('results'), list)
 
     def test_get_single_article(self):
         self.mock_login()
