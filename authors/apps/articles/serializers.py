@@ -10,6 +10,7 @@ class ArticlesSerializer(serializers.ModelSerializer):
     """
     author_name = serializers.CharField(source='author.username',
                                         required=False)
+    read_time = serializers.ReadOnlyField(source='read')
 
     def create(self, validated_data):
         """
@@ -21,7 +22,8 @@ class ArticlesSerializer(serializers.ModelSerializer):
         model = Article
         fields = ("slug", "title", "description", "body", "image", "tagList",
                   "createdAt", "updatedAt", "favoritesCount", "rating",
-                  "ratingsCount", "author", "author_name", "likes", "dislikes")
+                  "ratingsCount", "author", "author_name",
+                  "likes", "dislikes", "read_time")
         read_only_fields = ('author_name', )
 
     @staticmethod
