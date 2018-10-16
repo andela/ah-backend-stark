@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from .renderers import UserJSONRenderer
 from .serializers import (
     LoginSerializer, RegistrationSerializer, UserSerializer,
-    ResetPasswordSerializer 
+    ResetPasswordSerializer
 )
 from .serializers import (LoginSerializer, RegistrationSerializer,
                           UserSerializer)
@@ -39,14 +39,16 @@ class RegistrationAPIView(APIView):
         url = '/api/users/activate_account/'
         token = serializer.data['token']
         content = "Thank you for registering with Authors Haven.\
-        Follow this link to activate your account {}{}{}/".format(host, url, token)
-        
+        Follow this link to activate your account {}{}{}/".format(
+            host, url, token)
+
         send_mail(recipient, subject, content)
         user_data = serializer.data
         user_data.update({
-            "message": "User successfully registered. Check your email to activate account"
+            "message": "User successfully registered. " +
+            "Check your email to activate account"
         })
-    
+
         return Response(user_data, status=status.HTTP_201_CREATED)
 
 
@@ -94,6 +96,7 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class ResetPasswordView(RetrieveUpdateAPIView):
     permission_classes = (AllowAny,)
     renderer_classes = (UserJSONRenderer,)
@@ -103,15 +106,15 @@ class ResetPasswordView(RetrieveUpdateAPIView):
         user = request.data.get('user', {})
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
-        
+
         return Response(serializer.data,
                         status=status.HTTP_200_OK)
-
 
     def retrieve(self, request, token, *args, **kwargs):
         """this allows one to retrive the token from the end point
         """
-        msg = {'message': 'a link has been sent to your email', 'token': token}
+        msg = {
+            'message': 'a link has been sent to your email', 'token': token}
         return Response(msg, status=status.HTTP_200_OK)
 
 
@@ -132,6 +135,7 @@ class ChangePasswordView(UpdateAPIView):
         msg = {'message': 'Your password has been updated'}
         return Response(msg, status=status.HTTP_200_OK)
 
+
 class VerifyAccountAPIView(APIView, JWTAuthentication):
     renderer_classes = (UserJSONRenderer,)
     serializer_class = RegistrationSerializer
@@ -139,23 +143,24 @@ class VerifyAccountAPIView(APIView, JWTAuthentication):
     # function to retrieve user info from the token
     def get(self, request, token):
         try:
-            user, token = self.get_verification_credencials(request, token)
-            
+            user, token = self.get_verification_credencials(
+                request, token)
+
             if not user.is_verified:
                 user.is_verified = True
                 user.save()
                 return Response({
-                    "message": "Your account has been successfully activated. Complete profile" ,
-                    "token": token 
+                    "message": "Your account has been successfully " +
+                    "activated. Complete profile",
+                    "token": token
                 }, status=status.HTTP_200_OK)
-            
+
             return Response({
                 "message": "Account already activated. Please login"
             }, status=status.HTTP_200_OK)
-        
+
         except:
             return Response({
-                "message": "Sorry. Activation link either expired or is invalid"
+                "message": "Sorry. Activation link " +
+                "either expired or is invalid"
             }, status=status.HTTP_400_BAD_REQUEST)
-
-

@@ -1,6 +1,6 @@
 """views for profile app"""
 from rest_framework import status
-from rest_framework.generics import RetrieveUpdateAPIView,RetrieveAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import Profile
@@ -39,13 +39,16 @@ class UserProfile(RetrieveUpdateAPIView):
             serializer_data = {
                 'username': user_data.get('username', request.user.username),
                 'bio': user_data.get('bio', request.user.profile.bio),
-                'location': user_data.get('location', request.user.profile.location),
-                'fun_fact': user_data.get('fun_fact', request.user.profile.fun_fact),
+                'location': user_data.get(
+                    'location', request.user.profile.location),
+                'fun_fact': user_data.get(
+                    'fun_fact', request.user.profile.fun_fact),
                 'image': user_data.get('image', request.user.profile.image)
             }
 
             serializer = self.serializer_class(
-                request.user.profile, data=serializer_data, context={'request': request}, partial=True
+                request.user.profile, data=serializer_data,
+                context={'request': request}, partial=True
             )
             serializer.is_valid(raise_exception=True)
             serializer.update(request.user.profile, serializer_data)
@@ -53,13 +56,16 @@ class UserProfile(RetrieveUpdateAPIView):
             try:
                 serializer.update(request.user, serializer_data)
             except:
-                return Response({"error": "Username or email already exist, create a unique one"},
-                                status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "Username or email already exist, " +
+                        "create a unique one"},
+                    status.HTTP_400_BAD_REQUEST)
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            return Response({"error": "You can only update your own profile"},
-                                status.HTTP_400_BAD_REQUEST)
+            return Response({
+                "error": "You can only update your own profile"},
+                status.HTTP_400_BAD_REQUEST)
 
 
 class ListProfiles(RetrieveAPIView):
@@ -71,7 +77,8 @@ class ListProfiles(RetrieveAPIView):
 
         """ function to retrieve user profile information """
 
-        users=Profile.objects.all()
-        serializer = self.serializer_class(users,many=True)
-        return Response({"Authors":serializer.data}, status=status.HTTP_200_OK)
-
+        users = Profile.objects.all()
+        serializer = self.serializer_class(users, many=True)
+        return Response(
+            {"Authors": serializer.data},
+            status=status.HTTP_200_OK)
