@@ -1,0 +1,22 @@
+#!/bin/sh
+# pep8 check
+# run pep8 on all python staged files.
+
+pep8_options=$(git config hooks.pep8options)
+pep8_error=0
+for f in `git diff --cached --name-only | egrep ".py$"`
+do
+    git show :$f | pycodestyle --format=$f":%(row)d:%(col)d: %(code)s %(text)s" $pep8_options -
+    if [ $? -eq 1 ]; then
+        pep8_error=1
+    fi
+done
+
+if [ $pep8_error -eq 1 ]; then
+    echo
+    echo "Your have one or more PEP8 error(s) in your commit"
+    echo
+    echo "Please fix these errors and try commiting again"
+    echo
+    exit 1
+fi
