@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Article, Likes, Comment
+from .models import Article, Likes, Comment, Favourite
 from authors.apps.authentication.backends import JWTAuthentication
 from ast import literal_eval
 
@@ -17,11 +17,9 @@ class ArticlesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Article
-        fields = (
-            "slug", "title", "description", "body", "image",
-            "tagList", "createdAt", "updatedAt", "favorited",
-            "favoritesCount", "rating", "ratingsCount", "author",
-            "likes", "dislikes")
+        fields = ("slug", "title", "description", "body", "image", "tagList",
+                  "createdAt", "updatedAt", "favoritesCount", "rating",
+                  "ratingsCount", "author", "likes", "dislikes")
 
     @staticmethod
     def convert_tagList_to_str(request_data={}):
@@ -78,3 +76,28 @@ class CommentDetailSerializer(serializers.ModelSerializer):
         if obj.is_parent:
             return ChildCommentSerializer(obj.children(), many=True).data
         return None
+
+
+class FavouriteSerializer(serializers.ModelSerializer):
+    """This serializer class handles favourites """
+
+    username = serializers.ReadOnlyField(source='user.username')
+    article = serializers.ReadOnlyField(source='article.slug')
+
+    class Meta:
+        """Favourite serializer meta class"""
+        model = Favourite
+        fields = ("username", "article")
+
+
+class GetFavouriteSerializer(serializers.ModelSerializer):
+    """This serializer class handles getting favourites"""
+
+    title = serializers.CharField(source='article.title')
+    slug = serializers.CharField(source='article.slug')
+    description = serializers.CharField(source='article.description')
+
+    class Meta:
+        """get favourite serializer meta class"""
+        model = Favourite
+        fields = ("title", "slug", "description")
