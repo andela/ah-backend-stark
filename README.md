@@ -3,6 +3,8 @@ Authors Haven - A Social platform for the creative at heart.
 
 [![Build Status](https://travis-ci.org/andela/ah-backend-stark.svg?branch=develop)](https://travis-ci.org/andela/ah-backend-stark)
  [![Coverage Status](https://coveralls.io/repos/github/andela/ah-backend-stark/badge.svg?branch=develop)](https://coveralls.io/github/andela/ah-backend-stark?branch=develop)
+ [![Maintainability](https://api.codeclimate.com/v1/badges/d85527fb4731c3c3ffb2/maintainability)](https://codeclimate.com/github/andela/ah-backend-stark/maintainability)
+ 
 
 ## Vision
 Create a community of like minded authors to foster inspiration and innovation
