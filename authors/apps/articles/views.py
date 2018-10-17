@@ -1,26 +1,21 @@
 from rest_framework import status, serializers, exceptions
-from rest_framework.permissions import (
-    IsAuthenticatedOrReadOnly, IsAuthenticated
-)
+from rest_framework.permissions import (IsAuthenticatedOrReadOnly,
+                                        IsAuthenticated)
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
-from rest_framework.generics import (
-    UpdateAPIView, CreateAPIView, UpdateAPIView
-)
-
+from rest_framework.generics import (UpdateAPIView, CreateAPIView,
+                                     RetrieveAPIView)
 from .renderers import ArticleJSONRenderer, LikesJSONRenderer
-from .serializers import (
-    ArticlesSerializer, CommentSerializer,
-    CommentDetailSerializer, LikeSerializer
-)
+from .serializers import (ArticlesSerializer, CommentSerializer,
+                          CommentDetailSerializer, LikeSerializer)
 from .models import Article, Comment, Likes
 from authors.apps.authentication.backends import JWTAuthentication
 from django.shortcuts import get_object_or_404
 
 
 class ArticleCreationAPIView(APIView):
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticatedOrReadOnly, )
     serializer_class = ArticlesSerializer
 
     def get(self, request):
@@ -42,24 +37,19 @@ class ArticleCreationAPIView(APIView):
         serializer = self.serializer_class(data=article)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-
         res_data = Article.format_data_for_display(serializer.data)
-
         return Response(res_data, status=status.HTTP_201_CREATED)
 
 
 class GetSingleArticleAPIView(APIView):
-    permission_classes = (IsAuthenticatedOrReadOnly,)
-    renderer_classes = (ArticleJSONRenderer,)
+    permission_classes = (IsAuthenticatedOrReadOnly, )
+    renderer_classes = (ArticleJSONRenderer, )
     serializer_class = ArticlesSerializer
 
     def get(self, request, slug):
         article = Article.get_article(slug)
-
         if not article:
-            raise exceptions.NotFound(
-                'The selected article was not found.')
-
+            raise exceptions.NotFound('The selected article was not found.')
         serializer = self.serializer_class(article)
         res_data = Article.format_data_for_display(serializer.data)
         return Response({"article": res_data}, status.HTTP_200_OK)
@@ -73,7 +63,6 @@ class GetSingleArticleAPIView(APIView):
             serializer = self.serializer_class(status[0])
             res_data = Article.format_data_for_display(serializer.data)
             return Response(res_data, 202)
-
         return Response({'message': status[0]}, status[1])
 
     def delete(self, request, slug):
@@ -88,7 +77,7 @@ class RateArticleAPIView(APIView):
     This class contains the views regarding the article
     rating feature
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, )
     serializer_class = ArticlesSerializer
 
     def get_values(self, queryset):
@@ -101,8 +90,7 @@ class RateArticleAPIView(APIView):
     def validate_rating(self, rating):
         if rating not in list(range(1, 6)):
             raise exceptions.ParseError(
-                "Sorry, only a rating in the 1-5 range can be given."
-            )
+                "Sorry, only a rating in the 1-5 range can be given.")
 
     def put(self, request, slug):
         """
@@ -111,40 +99,30 @@ class RateArticleAPIView(APIView):
         """
         queryset = Article.objects.filter(slug=slug)
         article = self.get_values(queryset)
-
         if not queryset:
-            raise exceptions.NotFound(
-                'The selected article was not found.')
+            raise exceptions.NotFound('The selected article was not found.')
         elif article.get("author_id") == get_user_from_auth(request).id:
             raise exceptions.ParseError(
-                "Sorry, you cannot rate your own article."
-            )
+                "Sorry, you cannot rate your own article.")
 
         serializer_instance = queryset.first()
         serializer_data = request.data.get('article', {})
         self.validate_rating(serializer_data.get("rating"))
-
         current_rating = article['rating']
         current_rating_count = article['ratingsCount']
         user_rating = serializer_data.get('rating')
         new_rating = Article.calculate_rating(
-            current_rating,
-            current_rating_count,
-            user_rating)
-
+            current_rating, current_rating_count, user_rating)
         serializer_data["rating"] = new_rating["rating"]
         serializer_data["ratingsCount"] = new_rating["ratingsCount"]
         serializer = self.serializer_class(
-            serializer_instance,
-            data=serializer_data,
-            partial=True
-        )
+            serializer_instance, data=serializer_data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-
-        return Response(
-            {"article": serializer.data},
-            status=status.HTTP_202_ACCEPTED)
+        return Response({
+            "article": serializer.data
+        },
+                        status=status.HTTP_202_ACCEPTED)
 
 
 def get_user_from_auth(request):
@@ -158,8 +136,9 @@ def get_user_from_auth(request):
 
 
 class LikeView(CreateAPIView, UpdateAPIView):
-    permission_classes = (IsAuthenticated,)
-    renderer_classes = (LikesJSONRenderer,)
+    """like view class"""
+    permission_classes = (IsAuthenticated, )
+    renderer_classes = (LikesJSONRenderer, )
     serializer_class = LikeSerializer
 
     def create(self, request, *args, **kwargs):
@@ -173,30 +152,29 @@ class LikeView(CreateAPIView, UpdateAPIView):
             action = request.data.get('like', {})
             serializer = self.serializer_class(data=action)
             serializer.is_valid(raise_exception=True)
-            serializer.save(
-                action_by=self.request.user, article=self.article1)
-            return Response(
-                serializer.data, status=status.HTTP_201_CREATED)
+            serializer.save(action_by=self.request.user, article=self.article1)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
         article1 = self.kwargs["slug"]
         article = get_object_or_404(Article, slug=article1)
         try:
-            instance = Likes.objects.get(action_by=request.user.id,
-                                         article=article.id)
+            instance = Likes.objects.get(
+                action_by=request.user.id, article=article.id)
             action = request.data.get('like', {})
-            serializer = self.serializer_class(instance,
-                                               data=action, partial=True)
+            serializer = self.serializer_class(
+                instance, data=action, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception:
-            raise serializers.ValidationError('cannot update'
-                                              'like or dislike article', 400)
+            raise serializers.ValidationError(
+                'cannot update'
+                'like or dislike article', 400)
 
 
 class PostCommentApiView(APIView):
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticatedOrReadOnly, )
     serializer_class = CommentSerializer
 
     def get(self, request, slug):
@@ -219,7 +197,7 @@ class PostCommentApiView(APIView):
 
 
 class CommentDetailApiView(APIView):
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticatedOrReadOnly, )
     serializer_class = CommentDetailSerializer
 
     def get(self, request, slug, id):
@@ -231,9 +209,12 @@ class CommentDetailApiView(APIView):
         return Response({"comment": new_comment}, status.HTTP_200_OK)
 
     def format_dictionary(self, item):
-        new_comment = dict(id=item["id"], body=item["body"],
-                           user=item["user"], timestamp=item["timestamp"],
-                           reply=item["replies"])
+        new_comment = dict(
+            id=item["id"],
+            body=item["body"],
+            user=item["user"],
+            timestamp=item["timestamp"],
+            reply=item["replies"])
         return new_comment
 
     def post(self, request, slug, id):

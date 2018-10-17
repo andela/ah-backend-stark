@@ -19,8 +19,6 @@ class Article(models.Model):
     image = models.URLField(blank=True)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now_add=True)
-    favorited = models.BooleanField(default=False)
-    favoritesCount = models.IntegerField(default=0)
     rating = models.FloatField(default=0)
     ratingsCount = models.IntegerField(default=0)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -201,6 +199,11 @@ class Article(models.Model):
             article_id=self.id, action=False).count()
         return dislikes
 
+    def favoritesCount(self):
+        favourite = Favourite.objects.all().filter(
+            article=self.id).count()
+        return favourite
+
 
 class Likes(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
@@ -233,3 +236,12 @@ class Comment(models.Model):
         if self.parent_comment is not None:
             return False
         return True
+
+
+class Favourite(models.Model):
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.article.slug
