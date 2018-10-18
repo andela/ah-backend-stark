@@ -3,6 +3,7 @@ Authors Haven - A Social platform for the creative at heart.
 
 [![Build Status](https://travis-ci.org/andela/ah-backend-stark.svg?branch=develop)](https://travis-ci.org/andela/ah-backend-stark)
  [![Coverage Status](https://coveralls.io/repos/github/andela/ah-backend-stark/badge.svg?branch=develop)](https://coveralls.io/github/andela/ah-backend-stark?branch=develop)
+ [![Maintainability](https://api.codeclimate.com/v1/badges/d85527fb4731c3c3ffb2/maintainability)](https://codeclimate.com/github/andela/ah-backend-stark/maintainability)
 
 ## Vision
 Create a community of like minded authors to foster inspiration and innovation
@@ -79,11 +80,13 @@ Endpoints that can be tested on [Postman](https://www.getpostman.com/apps)
 |Method |Endpoint |Functionality  |
 |----------|:----------|------------|
 | POST  |/api/users/  |Register user  |
-| POST  |/api/users/login/  |Login a user  |
 |POST | /api/users/activate_account/:token/  | Verify user account|
+| POST  |/api/users/login/  |Login a user  |
 | GET | /api/user| Get current user|
 | GET |/api/profiles/:username/ | Get user profile |
 |PUT|/api/profiles/:username/ |Update profile |
+|POST|/api/profiles/:username/follow/|Follow user|
+|DELETE|/api/profiles/:username/unfollow/|Unfollow user|
 |POST|/api/articles/|Create article|
 |GET|/api/articles/|List articles |
 |GET|/api/articles/:slug/|Get article|
@@ -97,8 +100,6 @@ Endpoints that can be tested on [Postman](https://www.getpostman.com/apps)
 |GET|/api/articles/favourites/|List favourated articles|
 |POST|/api/articles/:slug/like/|Like articles|
 |PUT|/api/articles/:slug/like/|Unlike articles|
-|POST|/api/profiles/:username/follow/|Follow user|
-|DELETE|/api/profiles/:username/unfollow/|Unfollow user|
 |PUT|/api/articles/:slug/rate_article/|Rate aricle|
 
 
