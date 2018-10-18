@@ -201,14 +201,8 @@ class Article(models.Model):
             article_id=self.id, action=False).count()
         return dislikes
 
-
 class Likes(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     action_by = models.ForeignKey(User, on_delete=models.CASCADE)
-<<<<<<< HEAD
-    action  = models.BooleanField()
-    action_at = models.DateTimeField(auto_now_add=True)       
-=======
     action = models.BooleanField()
     action_at = models.DateTimeField(auto_now_add=True)
->>>>>>> develop
