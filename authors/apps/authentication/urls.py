@@ -2,7 +2,8 @@ from django.urls import path
 from .views import (
     LoginAPIView, RegistrationAPIView, UserRetrieveUpdateAPIView,
     ResetPasswordView, ResetPasswordView, ChangePasswordView,
-    LoginAPIView, RegistrationAPIView, UserRetrieveUpdateAPIView, VerifyAccountAPIView
+    LoginAPIView, RegistrationAPIView, UserRetrieveUpdateAPIView,
+    VerifyAccountAPIView
 )
 
 urlpatterns = [

@@ -11,9 +11,9 @@ class ProfileJSONRenderer(JSONRenderer):
         errors = data.get('errors', None)
 
         if errors is not None:
-           
+
             return super(ProfileJSONRenderer, self).render(data)
 
         return json.dumps({
             self.object_label: data
-        }) 
+        })

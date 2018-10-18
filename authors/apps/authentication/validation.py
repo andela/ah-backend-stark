@@ -1,9 +1,10 @@
 import re
 from rest_framework import serializers
 
+
 def validate(data):
-    """This method validates username, email address 
-    and password  on registration"""
+    """ This method validates username, email address
+    and password  on registration """
 
     username = str(data.get('username', None)).strip()
     email = data.get('email', None)
@@ -11,7 +12,7 @@ def validate(data):
 
     if (not username or
         not password or
-        not email):
+            not email):
         raise serializers.ValidationError({
             'error': 'All fields are required for registration'
         })
@@ -23,22 +24,23 @@ def validate(data):
 
     if not re.match(r"^[A-Za-z]+[\d\w_]+", username):
         raise serializers.ValidationError({
-            'username': 'Username should start with letters, '+
+            'username': 'Username should start with letters, ' +
             'and optionally include numbers and underscores'
         })
 
-    if not re.search(r"^[a-z0-9_.+-]+@[a-z]+\.[a-z]+$",email):
+    if not re.search(r"^[a-z0-9_.+-]+@[a-z]+\.[a-z]+$", email):
         raise serializers.ValidationError({
             'email': 'A valid email address is required to signup'
         })
-    
+
     strong_password(password)
 
     return {
-            "username" : username,
-            "email" : email,
+            "username": username,
+            "email": email,
             "password": password
         }
+
 
 def strong_password(password):
     """ This method checks if a user password is strong """
@@ -48,11 +50,11 @@ def strong_password(password):
     atleast_number = re.search("[0-9]", password)
 
     if (not long_password or
-        not capital_letter or 
-        not atleast_number):
+        not capital_letter or
+            not atleast_number):
 
         raise serializers.ValidationError({
-            'password': 'Weak password: Password should be '+
-            'atleast 8 characters long, '+
+            'password': 'Weak password: Password should be ' +
+            'atleast 8 characters long, ' +
             'include atleast a capital letter and a number'
         })

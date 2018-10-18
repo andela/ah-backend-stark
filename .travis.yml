@@ -13,6 +13,7 @@ install:
   - pip install -r requirements.txt
   - pip install coverage
   - pip install coveralls
+  - pip install pycodestyle
 
 before_script:
   - psql -c 'CREATE DATABASE test_db;' -U postgres
@@ -25,6 +26,7 @@ script:
   - python manage.py migrate
   - coverage run --source=authors/ manage.py test
   - coverage report -m
+  - pycodestyle --exclude="*/migrations/*" authors
 
 after_success:
   - coveralls

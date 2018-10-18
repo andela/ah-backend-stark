@@ -21,7 +21,6 @@ class UserJSONRenderer(JSONRenderer):
                 'errors': errors
             })
 
-
         # Finally, we can render our data under the "user" namespace.
         return json.dumps({
             'user': data
