@@ -1,6 +1,6 @@
 """profile app url file"""
 from django.urls import path
-from .views import  UserProfile, ListProfiles, UserFollow, UserUnfollow, UserFollowers, UserFollowing
+from .views import UserProfile, ListProfiles, UserFollow, UserUnfollow, UserFollowers, UserFollowing
 
 urlpatterns = [
     path('profile/<str:username>/', UserProfile.as_view()),

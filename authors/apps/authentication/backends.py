@@ -34,15 +34,15 @@ class JWTAuthentication(authentication.BaseAuthentication):
         return (user, token)
 
     def get_verification_credencials(self, request, token):
-            """
+        """
             Try to authenticate the given credentials. If authentication is
             successful, return the user and token. If not, throw an error.
             """
 
-            payload = self.decode_token(token)
-            user = self.get_user(payload)
+        payload = self.decode_token(token)
+        user = self.get_user(payload)
 
-            return (user, token)
+        return (user, token)
 
     def decode_token(self, token):
         try:

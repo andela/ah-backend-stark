@@ -27,8 +27,8 @@ class BaseTest(TestCase):
                 "email": "test6@test.com",
                 "is_active": "False",
                 "password": "testpassword"
-                }
-                              }
+            }
+        }
         self.reg_data2 = {
             "user": {
                 "username": "test7",
@@ -122,11 +122,7 @@ class BaseTest(TestCase):
             }
         }
 
-        self.password_update = {
-                "user": {
-                        "password": "Newpaswd1"
-                    }
-                }
+        self.password_update = {"user": {"password": "Newpaswd1"}}
         User.objects.create_user(
             "test5", "test5@test.com", password="Testpassword3")
         self.user = User.objects.get(email="test5@test.com")
@@ -164,41 +160,22 @@ class BaseTest(TestCase):
             }
         }
 
-        self.article_rating_4 = {
-            "article": {
-                "rating": 4
-            }
-        }
+        self.article_rating_4 = {"article": {"rating": 4}}
 
-        self.article_rating_5 = {
-            "article": {
-                "rating": 5
-            }
-        }
+        self.article_rating_5 = {"article": {"rating": 5}}
 
-        self.article_rating_6 = {
-            "article": {
-                "rating": 6
-            }
-        }
-        self.like_article = {
-            "like": {"action": 1}
-        }
-        self.dislike_article = {
-            "like": {"action": 0}
-        }
+        self.article_rating_6 = {"article": {"rating": 6}}
+        self.like_article = {"like": {"action": 1}}
+        self.dislike_article = {"like": {"action": 0}}
 
-        self.user_email = {
-            "user": {
-                "email": "test@test.com"
-            }
-        }
+        self.user_email = {"user": {"email": "test@test.com"}}
 
         # Test the article model functions
         self.article = Article.objects.create(
             title="my title",
             description='my description',
-            body='my body', author=self.user)
+            body='my body',
+            author=self.user)
 
         self.article.save()
         # update the article
@@ -221,11 +198,9 @@ class BaseTest(TestCase):
 
         It helps in authenticating requests
         """
-        res = self.client.post(
-            "/api/users/", self.reg_data, format="json")
+        res = self.client.post("/api/users/", self.reg_data, format="json")
         token = res.data['token']
-        self.client.get(
-            "/api/users/activate_account/{}/".format(token))
+        self.client.get("/api/users/activate_account/{}/".format(token))
         login_response = self.client.post(
             "/api/users/login/", self.login_data, format="json")
 
@@ -241,11 +216,9 @@ class BaseTest(TestCase):
 
         It helps in authenticating requests
         """
-        res = self.client.post(
-            "/api/users/", self.reg_data2, format="json")
+        res = self.client.post("/api/users/", self.reg_data2, format="json")
         token = res.data['token']
-        self.client.get(
-            "/api/users/activate_account/{}/".format(token))
+        self.client.get("/api/users/activate_account/{}/".format(token))
         login_response = self.client.post(
             "/api/users/login/", self.login_data2, format="json")
 

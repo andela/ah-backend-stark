@@ -48,10 +48,9 @@ class BaseTest(TestCase):
         self.register_user = self.client.post(
             "/api/users/", self.reg_data, format="json")
         token1 = self.register_user.data["token"]
-        self.client.get(
-            "/api/users/activate_account/{}/".format(token1))
+        self.client.get("/api/users/activate_account/{}/".format(token1))
         self.client.credentials(HTTP_TOKEN=token1)
-    
+
     def mock_login(self, reg_data):
         """
         This helper method creates a user, logs then in,
@@ -61,12 +60,12 @@ class BaseTest(TestCase):
         It helps in authenticating requests
         """
         self.client.post("/api/users/", self.reg_data, format="json")
-        login_response = self.client.post("/api/users/login/",
-                         self.reg_data, format="json")
+        login_response = self.client.post(
+            "/api/users/login/", self.reg_data, format="json")
 
         data = login_response.data
         token = data['token']
         self.client.credentials(HTTP_TOKEN=token)
-    
+
     def mock_registration(self, reg_data):
         self.client.post("/api/users/", self.reg_data, format="json")

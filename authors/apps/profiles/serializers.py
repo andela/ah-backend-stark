@@ -15,7 +15,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         """profile app serializer meta class"""
         model = Profile
         fields = ('username', 'bio', 'location', 'fun_fact', 'image')
-        read_only_fields = ('username',)
+        read_only_fields = ('username', )
 
 
 class FollowingSerializer(serializers.ModelSerializer):
