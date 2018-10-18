@@ -12,9 +12,9 @@ class BaseTest(TestCase):
 
         self.client = APIClient()
         self.reg_data = {"user": {
-            "username":"test",
+            "username":"test12",
             "email":"test@test.com",
-            "password":"testpassword"
+            "password":"Testpassword1"
                 }
                          }
         self.deactive_user = {"user": {
@@ -27,66 +27,89 @@ class BaseTest(TestCase):
         self.reg_data2 = {"user": {
             "username":"test7",
             "email":"test7@test.com",
-            "password":"testpassword"
+            "password":"Testpassword2"
                 }
                           }
        
         self.login_data = {"user": {
             "email":"test@test.com",
-            "password":"testpassword"}
+            "password":"Testpassword1"}
                            }
 
         self.login_data2 = {"user": {
             "email":"test7@test.com",
-            "password":"testpassword"}
+            "password":"Testpassword2"}
                            }
 
         self.missing_username = {
             "user": {
                 "username":"",
-                "email":"test@test.com",
-                "password":"test_password"}
+                }
                                 }
+    
+        self.short_username = {
+            "user": {
+                "username": "test",
+                "email":"test6@test.com",
+                "password":"12345678"
+            }
+        }
 
         self.missing_email = {
             "user": {
-                "username":"test",
+                "username":"test12",
                 "email":"",
                 "password":"test_password"}
                             }
 
         self.invalid_email = {
             "user": {
-                "username":"test",
+                "username":"test12",
                 "email":"test",
                 "password":"test_password"}
         }
 
         self.short_password = {
             "user": {
-                "username":"test",
+                "username":"test12",
                 "email":"test@test.com",
                 "password":"test"}
                             }
 
-        self.non_alphanumeric_password = {
+        self.password_with_no_caps = {
             "user": {
-                "username":"test",
+                "username":"test12",
                 "email":"test@test.com",
-                "password":"@$* p#$%"}
+                "password":"testpassword1"}
         }
+
+        self.missing_password = {
+            "user": {
+                "username":"test12",
+                "email":"",
+                "password":"testpassword"}
+        }
+
+        self.pswd_no_number = {
+            "user": {
+                "username":"test12",
+                "email":"test@test.com",
+                "password":"Testpassword"}
+        }
+
         self.profile_update = {"profile": {
             "username":"test1",
             "email":"test6@test.com",
             "bio":"test",
             "location":"mbuya"}
-                            }
+        }
+
         self.password_update ={
                 "user":{
-                        "password": "12345678"
+                        "password": "Newpaswd1"
                     }
                 }
-        User.objects.create_user("test5", "test5@test.com", password="12345678")
+        User.objects.create_user("test5", "test5@test.com", password="Testpassword3")
         self.user = User.objects.get(email="test5@test.com")
         self.user.is_active = True
         self.user.save()

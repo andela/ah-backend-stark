@@ -28,7 +28,6 @@ var/
 
 # Django Migrations
 migrations/
-authors/apps/articles/migrations
 authors/apps/authentication/migrations/*
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -103,6 +102,3 @@ db.sqlite3
 
 #DS store
 .DS_Store
-
-# migrations folder and files
-migrations

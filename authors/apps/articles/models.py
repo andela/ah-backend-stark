@@ -15,6 +15,7 @@ class Article(models.Model):
     description = models.CharField(max_length=500)
     body = models.TextField()
     tagList = models.CharField(max_length=2000, blank=True)
+    image = models.URLField(blank=True)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now_add=True)
     favorited = models.BooleanField(default=False)
@@ -68,14 +69,9 @@ class Article(models.Model):
     def article_exists(slug):
         return Article.objects.filter(slug=slug).exists()
 
-
     @staticmethod
     def get_article(slug):
         return Article.objects.filter(slug=slug).first()
-    
-    @staticmethod
-    def get_single_article(slug):
-        return Article.objects.filter(slug=slug)
 
     @staticmethod
     def get_article_by_author(author_id,slug):
@@ -119,6 +115,7 @@ class Article(models.Model):
             new_description = new_data.get('description',article.description)
             new_body = new_data.get('body',article.body)
             new_tagList = str(new_data.get('tagList',article.tagList))
+            new_image =  new_data.get('image',article.image)
             updated_time= timezone.now()
 
             article_queryset.update(
@@ -127,6 +124,7 @@ class Article(models.Model):
                        description = new_description,
                        body = new_body,
                        tagList = new_tagList,
+                       image = new_image,
                        updatedAt=updated_time)
 
             article = Article.get_article(new_slug)
@@ -183,23 +181,16 @@ class Article(models.Model):
     def __str__(self):
         return self.title
 
-    def count_likes_or_dislikes(self, action):
-        likes = Likes.objects.all().filter(article_id=self.id, action = action).count()
-        return likes
-
     def likes(self):
-        likes = self.count_likes_or_dislikes(True)
+        likes = Likes.objects.all().filter(article_id=self.id, action = True).count()
         return likes
 
     def dislikes(self):
-        dislikes = self.count_likes_or_dislikes(False)
-        return dislikes
-
+        dislikes = Likes.objects.all().filter(article_id=self.id, action = False).count()
+        return dislikes    
 
 class Likes(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     action_by = models.ForeignKey(User, on_delete=models.CASCADE)
     action  = models.BooleanField()
     action_at = models.DateTimeField(auto_now_add=True)       
-
-

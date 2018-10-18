@@ -12,17 +12,17 @@ class BaseTest(TestCase):
         self.reg_data = {"user": {
             "username":"test123",
             "email":"test1123@test.com",
-            "password":"testpassword"}
+            "password":"Testpassword1"}
                          }
 
         self.reg_data2 = {"user": {
             "username":"test1234",
             "email":"test11234@test.com",
-            "password":"testpassword"}
+            "password":"Testpassword2"}
                          } 
                                                   
         self.profile_update = {"profile": {
-            "username":"test1",
+            "username":"test123",
             "email":"test6@test.com",
             "bio":"test",
             "location":"mbuya"}
@@ -33,7 +33,7 @@ class BaseTest(TestCase):
             "bio":"test",
             "location":"mbuya"}
                                }                       
-        self.register_user = self.client.post("/api/users/", self.reg_data2, format="json")
+        self.register_user = self.client.post("/api/users/", self.reg_data2, format="json")                       
         self.register_user = self.client.post("/api/users/", self.reg_data, format="json")
         token1 = self.register_user.data["token"]
         self.client.get("/api/users/activate_account/{}/".format(token1))

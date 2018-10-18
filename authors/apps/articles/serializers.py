@@ -17,7 +17,7 @@ class ArticlesSerializer(serializers.ModelSerializer):
  
     class Meta:
         model = Article
-        fields = ("slug","title", "description", "body",
+        fields = ("slug","title", "description", "body","image",
          "tagList","createdAt","updatedAt","favorited","favoritesCount", "rating", "ratingsCount", "author","likes", "dislikes")
 
     @staticmethod

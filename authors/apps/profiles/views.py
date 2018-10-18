@@ -1,6 +1,6 @@
 """views for profile app"""
-from rest_framework import status, exceptions
-from rest_framework.generics import RetrieveUpdateAPIView, RetrieveAPIView
+from rest_framework import status
+from rest_framework.generics import RetrieveUpdateAPIView,RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -76,7 +76,7 @@ class ListProfiles(RetrieveAPIView):
 
         users=Profile.objects.all()
         serializer = self.serializer_class(users,many=True)
-        return Response({"Authors":serializer.data}, status=status.HTTP_200_OK)
+        return Response({"Authors": serializer.data}, status=status.HTTP_200_OK)
 
 
 class UserFollow(APIView):
@@ -142,7 +142,7 @@ class UserFollowers(APIView):
 
     permission_classes = (IsAuthenticated,)
     serializer_class = ProfileSerializer
-    query="followers"
+    query = "followers"
 
     def get(self, request, username):
         follower_list = Following.get_list(request, 
@@ -156,4 +156,4 @@ class UserFollowing(UserFollowers):
     """
     View class for users to see everyone they are following
     """
-    query="following"
+    query = "following"
