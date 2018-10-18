@@ -1,21 +1,18 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import status, serializers, exceptions
-from rest_framework.generics import CreateAPIView, UpdateAPIView
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import (
-    IsAuthenticatedOrReadOnly, IsAuthenticated
-)
+from rest_framework.permissions import (IsAuthenticatedOrReadOnly,
+                                        IsAuthenticated, AllowAny)
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from rest_framework.generics import (UpdateAPIView, CreateAPIView,
+                                     RetrieveAPIView, ListAPIView)
+from .renderers import ArticleJSONRenderer, LikesJSONRenderer
+from .serializers import (ArticlesSerializer, CommentSerializer,
+                          CommentDetailSerializer, LikeSerializer)
+from .models import Article, Comment, Likes
 from authors.apps.authentication.backends import JWTAuthentication
 from .mixins import AhPaginationMixin
-from .models import Article, Likes, Comment
-from .renderers import ArticleJSONRenderer, LikesJSONRenderer
-from .serializers import (
-    ArticlesSerializer, CommentSerializer,
-    CommentDetailSerializer, LikeSerializer
-)
 
 
 class ArticleCreationAPIView(APIView, AhPaginationMixin):
@@ -243,3 +240,37 @@ class CommentDetailApiView(APIView):
         comment = Comment.objects.get(pk=id)
         comment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class SearchArticleView(ListAPIView):
+    permission_classes = (AllowAny, )
+    serializer_class = ArticlesSerializer
+
+    def get(self, request):
+        search_params = request.query_params
+        query_set = Article.objects.all()
+
+        author = search_params.get('author', None)
+        title = search_params.get('title', None)
+        tag = search_params.get('tag', None)
+        keywords = search_params.get('keywords', None)
+
+        if author:
+            query_set = query_set.filter(author__username=author)
+        if title:
+            query_set = query_set.filter(title__icontains=title)
+        if tag:
+            query_set = query_set.filter(tagList__icontains=tag)
+        if keywords:
+            words = str(keywords).split(',')
+            final_queryset = ''
+            for word in words:
+                final_queryset = query_set.filter(title__icontains=word)
+            query_set = final_queryset
+
+        serializer = self.serializer_class(query_set, many=True)
+        res_data = serializer.data
+        if res_data:
+            res_data = Article.format_data_for_display(res_data)
+
+        return Response({"search results": res_data}, status.HTTP_200_OK)

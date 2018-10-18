@@ -147,6 +147,24 @@ class BaseTest(TestCase):
             }
         }
 
+        self.article_3 = {
+            "article": {
+                "title": "title 3",
+                "description": "description 4?",
+                "body": "body",
+                "tagList": ["medium", "bold"]
+            }
+        }
+
+        self.article_4 = {
+            "article": {
+                "title": "my story",
+                "description": "Describe?",
+                "body": "La body",
+                "tagList": ["Hello", "Hmm"]
+            }
+        }
+
         self.invalid_article = {
             "article": {
                 "title": "title me",
@@ -173,14 +191,13 @@ class BaseTest(TestCase):
         self.comment1 = {"comment": {"body": "something else"}}
         # Test the article model functions
         self.article = Article.objects.create(
-            title="my title",
+            title="lego",
             description='my description',
             body='my body',
             author=self.user)
-
         self.article.save()
         # update the article
-        Article.update_article(self.user.id, 'my-title', self.article_2)
+        Article.update_article(self.user.id, 'lego', self.article_2)
         # check whether the modified article exists via new slug
         Article.article_exists('let-me-see')
         test_data = Article.get_article('let-me-see')
@@ -236,3 +253,6 @@ class BaseTest(TestCase):
             '/api/articles/titlely/comments/',
             data=self.comment1,
             format="json")
+
+    def create_article(self, article):
+        self.client.post('/api/articles/', article, format="json")
