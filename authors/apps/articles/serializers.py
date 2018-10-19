@@ -53,8 +53,7 @@ class LikeSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ("id", "user", "body", "article",
-                  "timestamp")
+        fields = ("id", "user", "body", "article", "timestamp")
 
 
 class ChildCommentSerializer(serializers.ModelSerializer):
@@ -68,8 +67,8 @@ class CommentDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ("id", "user", "body", "article",
-                  "timestamp", "replies", "parent_comment")
+        fields = ("id", "user", "body", "article", "timestamp", "replies",
+                  "parent_comment")
 
     @staticmethod
     def get_replies(obj):

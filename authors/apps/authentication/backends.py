@@ -27,9 +27,8 @@ class JWTAuthentication(authentication.BaseAuthentication):
         user = self.get_user(payload)
 
         if not user.is_verified:
-            msg = (
-                "This user account is not verified. " +
-                "Check your email for activation link")
+            msg = ("This user account is not verified. " +
+                   "Check your email for activation link")
             raise exceptions.AuthenticationFailed(msg)
 
         return (user, token)

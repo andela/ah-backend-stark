@@ -17,11 +17,7 @@ class UserJSONRenderer(JSONRenderer):
             # As mentioned about, we will let the default JSONRenderer handle
             # rendering errors.
             # return super(UserJSONRenderer, self).render(data)
-            return json.dumps({
-                'errors': errors
-            })
+            return json.dumps({'errors': errors})
 
         # Finally, we can render our data under the "user" namespace.
-        return json.dumps({
-            'user': data
-        })
+        return json.dumps({'user': data})

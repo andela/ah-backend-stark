@@ -1,6 +1,6 @@
 """profile app serializer file"""
 from rest_framework import serializers
-from .models import Profile
+from .models import Profile, Following
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -15,4 +15,21 @@ class ProfileSerializer(serializers.ModelSerializer):
         """profile app serializer meta class"""
         model = Profile
         fields = ('username', 'bio', 'location', 'fun_fact', 'image')
-        read_only_fields = ('username',)
+        read_only_fields = ('username', )
+
+
+class FollowingSerializer(serializers.ModelSerializer):
+    """
+    serializer class for followers
+    """
+
+    class Meta:
+        """profile app serializer meta class"""
+        model = Following
+        fields = ('user', 'following_id')
+
+    def create(self, validated_data):
+        """
+        Create and return a new article instance given the validated data
+        """
+        return Following.objects.create(**validated_data)
