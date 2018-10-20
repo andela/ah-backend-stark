@@ -55,7 +55,8 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ("id", "user", "body", "article", "timestamp", "username")
+        fields = ("id", "user", "body", "article",
+                  "timestamp", "username", "parent_comment")
 
 
 class ChildCommentSerializer(serializers.ModelSerializer):

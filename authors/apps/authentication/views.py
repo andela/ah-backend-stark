@@ -115,12 +115,27 @@ class ResetPasswordView(RetrieveUpdateAPIView):
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        recipient = serializer.data['email']
+        subject = 'Password For Authors Haven Account'
+        host = 'https://ah-frontend-stark.herokuapp.com'
+        url = '/password-reset/done/'
+        content = "Follow this link to Reset\
+        your account password {}{}".format(
+            host, url
+        )
+        print(content)
+        send_email(recipient, subject, content)
+
+        return Response(serializer.data,
+                        status=status.HTTP_200_OK)
 
     def retrieve(self, request, token, *args, **kwargs):
         """this allows one to retrive the token from the end point
         """
-        msg = {'message': 'a link has been sent to your email', 'token': token}
+        msg = {
+            'message': 'this token is valid for a small amount of time',
+            'token': token
+        }
         return Response(msg, status=status.HTTP_200_OK)
 
 
@@ -172,7 +187,7 @@ class VerifyAccountAPIView(APIView, JWTAuthentication):
                     "token":
                     token
                 },
-                                status=status.HTTP_200_OK)
+                    status=status.HTTP_200_OK)
 
             if redirect_url:
                 return HttpResponseRedirect(redirect_url)
@@ -191,4 +206,4 @@ class VerifyAccountAPIView(APIView, JWTAuthentication):
                 "message":
                 "Sorry. Activation link " + "either expired or is invalid"
             },
-                            status=status.HTTP_400_BAD_REQUEST)
+                status=status.HTTP_400_BAD_REQUEST)
