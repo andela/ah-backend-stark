@@ -228,7 +228,7 @@ class TestArticle(BaseTest):
             data=self.comment1,
             format="json")
         response = self.client.post(
-            '/api/articles/titlely/comments/4/',
+            '/api/articles/titlely/comments/6/',
             data={"reply": {
                 "body": "something else"
             }},
@@ -343,3 +343,76 @@ class TestArticle(BaseTest):
                 author, tag, keywords))
         self.assertEqual(len(response.data['search results']), 1)
         self.assertEqual(response.status_code, 200)
+
+    def test_incrementing_reading_stats(self):
+        """This method tests incrementing a user's
+        reading count"""
+        self.mock_login()
+        self.client.post("/api/articles/", self.article_1, format="json")
+        self.different_user_mock_login()
+        res_check1 = self.client.get("/api/profile/test7/", format="json")
+        data_check1 = res_check1.data
+        self.client.get('/api/articles/titlely')
+        res_check2 = self.client.get("/api/profile/test7/", format="json")
+        data_check2 = res_check2.data
+        self.assertEqual(data_check1.get('articles_read'), 0)
+        self.assertEqual(data_check2.get('articles_read'), 1)
+
+    def test_user_reading_own_article(self):
+        """This method checks whether reading count is
+        incremented when a user reads their own article"""
+        self.mock_login()
+        self.client.post("/api/articles/", self.article_1, format="json")
+        res_check1 = self.client.get("/api/profile/test12/", format="json")
+        data_check1 = res_check1.data
+        self.client.get('/api/articles/titlely')
+        res_check2 = self.client.get("/api/profile/test12/", format="json")
+        data_check2 = res_check2.data
+        self.assertEqual(data_check1.get('articles_read'), 0)
+        self.assertEqual(data_check2.get('articles_read'), 0)
+
+    def test_reading_an_article_twice(self):
+        """This method checks whether reading stats are
+        incremented whenever a user reads the same article"""
+        self.mock_login()
+        self.client.post("/api/articles/", self.article_1, format="json")
+        self.different_user_mock_login()
+        res_check1 = self.client.get("/api/profile/test7/", format="json")
+        data_check1 = res_check1.data
+        self.client.get('/api/articles/titlely')
+        self.client.get('/api/articles/titlely')
+        self.client.get('/api/articles/titlely')
+        res_check2 = self.client.get("/api/profile/test7/", format="json")
+        data_check2 = res_check2.data
+        self.assertEqual(data_check1.get('articles_read'), 0)
+        self.assertEqual(data_check2.get('articles_read'), 1)
+
+    def test_incrementing_writing_stats(self):
+        """This method tests incrementing a user's
+        writing stats"""
+        self.mock_login()
+        res_check1 = self.client.get("/api/profile/test12/", format="json")
+        data_check1 = res_check1.data
+        self.client.post("/api/articles/", self.article_1, format="json")
+        res_check2 = self.client.get("/api/profile/test12/", format="json")
+        data_check2 = res_check2.data
+        self.assertEqual(data_check1.get('articles_written'), 0)
+        self.assertEqual(data_check2.get('articles_written'), 1)
+
+    def test_decrementing_writing_stats(self):
+        """This method tests incrementing a user's
+        writing stats"""
+        self.mock_login()
+        res_check1 = self.client.get("/api/profile/test12/", format="json")
+        data_check1 = res_check1.data
+        self.client.post("/api/articles/", self.article_1, format="json")
+        res_check2 = self.client.get("/api/profile/test12/", format="json")
+        data_check2 = res_check2.data
+        res_delete = self.client.delete('/api/articles/titlely')
+        pass
+        res_check3 = self.client.get("/api/profile/test12/", format="json")
+        data_check3 = res_check2.data
+        self.assertEqual(data_check1.get('articles_written'), 0)
+        self.assertEqual(data_check2.get('articles_written'), 1)
+        self.assertEqual(data_check3.get('articles_written'), 1)
+        self.assertEqual(res_delete.status_code, status.HTTP_200_OK)

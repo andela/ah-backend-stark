@@ -2,6 +2,7 @@ import re
 from django.db import models
 from django.template.defaultfilters import slugify
 from authors.apps.authentication.models import User
+from authors.apps.profiles.models import Profile
 from ast import literal_eval
 from django.utils import timezone
 
@@ -250,3 +251,19 @@ class Favourite(models.Model):
 
     def __str__(self):
         return self.article.slug
+
+
+class ArticlesRead(models.Model):
+    """
+    model for articles read
+    """
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    slug = models.TextField()
+
+    def __str__(self):
+        return self.user
+
+    @staticmethod
+    def already_read(user, slug):
+        queryset = ArticlesRead.objects.filter(user=user, slug=slug)
+        return queryset.exists()

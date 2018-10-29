@@ -120,14 +120,10 @@ class ResetPasswordView(RetrieveUpdateAPIView):
         host = 'https://ah-frontend-stark.herokuapp.com'
         url = '/password-reset/done/'
         content = "Follow this link to Reset\
-        your account password {}{}".format(
-            host, url
-        )
-        print(content)
+        your account password {}{}".format(host, url)
         send_email(recipient, subject, content)
 
-        return Response(serializer.data,
-                        status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, token, *args, **kwargs):
         """this allows one to retrive the token from the end point
@@ -187,7 +183,7 @@ class VerifyAccountAPIView(APIView, JWTAuthentication):
                     "token":
                     token
                 },
-                    status=status.HTTP_200_OK)
+                                status=status.HTTP_200_OK)
 
             if redirect_url:
                 return HttpResponseRedirect(redirect_url)
@@ -206,4 +202,4 @@ class VerifyAccountAPIView(APIView, JWTAuthentication):
                 "message":
                 "Sorry. Activation link " + "either expired or is invalid"
             },
-                status=status.HTTP_400_BAD_REQUEST)
+                            status=status.HTTP_400_BAD_REQUEST)

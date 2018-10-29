@@ -13,6 +13,8 @@ class Profile(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     fun_fact = models.TextField(blank=True)
     location = models.TextField(blank=True)
+    articles_read = models.IntegerField(default=0)
+    articles_written = models.IntegerField(default=0)
 
     def __str__(self):
         return self.user.username
@@ -20,6 +22,33 @@ class Profile(models.Model):
     @staticmethod
     def get_user(username):
         return Profile.objects.filter(username=username).values()[0]
+
+    @staticmethod
+    def update_write_stats(request, profile_serializer_class, action):
+        """
+        This method increments the articles_written and
+        current_articles fields when a user posts an article
+        """
+        field_str = "articles_written"
+        username = request.user.username
+        profile = Profile.objects.select_related('user').get(
+            user__username=username)
+        Profile.update_profile_stats(request, profile_serializer_class,
+                                     profile.articles_written, field_str,
+                                     action)
+
+    @staticmethod
+    def update_profile_stats(request, serializer_class, field, field_str,
+                             action):
+        if action == "increment":
+            new_count = field + 1
+        elif action == "decrement":
+            new_count = field - 1
+        profile_serializer_data = {field_str: new_count}
+        profile_serializer = serializer_class(
+            request.user.profile, data=profile_serializer_data, partial=True)
+        profile_serializer.is_valid(raise_exception=True)
+        profile_serializer.save()
 
 
 class Following(models.Model):

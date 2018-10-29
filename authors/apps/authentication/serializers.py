@@ -151,8 +151,7 @@ class ResetPasswordSerializer(serializers.Serializer):
         user = get_object_or_404(User, email=email)
         if user is None:
             raise serializers.ValidationError(
-                'there is something wrong with your email'
-            )
+                'there is something wrong with your email')
         return {
             'email': email,
             'token': user.token(),
