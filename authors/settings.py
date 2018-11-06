@@ -33,15 +33,12 @@ STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 STATIC_URL = '/static/'
 
 # Other places for collectstatic to find static files.
-STATICFILES_DIRS = (
-    os.path.join(PROJECT_ROOT, 'static'),
-)
+STATICFILES_DIRS = (os.path.join(PROJECT_ROOT, 'static'), )
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 ALLOWED_HOSTS = [
-    'ah-backend-stark-staging.herokuapp.com',
-    'ah-backend-stark.herokuapp.com',
+    'ah-backend-stark-staging.herokuapp.com', 'ah-backend-stark.herokuapp.com',
     'localhost', '127.0.0.1'
 ]
 
@@ -54,11 +51,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     'corsheaders',
     'django_extensions',
     'rest_framework',
-
     'authors.apps.authentication',
     'authors.apps.core',
     'authors.apps.profiles',
@@ -101,29 +96,28 @@ WSGI_APPLICATION = 'authors.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-DATABASES = {
-    'default': dj_database_url.parse(get_database_url())
-}
-
+DATABASES = {'default': dj_database_url.parse(get_database_url())}
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation' +
+        'NAME':
+        'django.contrib.auth.password_validation' +
         '.UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation' +
-        '.MinimumLengthValidator',
+        'NAME':
+        'django.contrib.auth.password_validation' + '.MinimumLengthValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation' +
-        '.CommonPasswordValidator',
+        'NAME':
+        'django.contrib.auth.password_validation' + '.CommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation' +
+        'NAME':
+        'django.contrib.auth.password_validation' +
         '.NumericPasswordValidator',
     },
 ]
@@ -158,12 +152,12 @@ CORS_ORIGIN_WHITELIST = (
 AUTH_USER_MODEL = 'authentication.User'
 
 REST_FRAMEWORK = {
-    'EXCEPTION_HANDLER': 'authors.apps.core.exceptions.core_exception_handler',
-    'NON_FIELD_ERRORS_KEY': 'error',
-
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'authors.apps.authentication.backends.JWTAuthentication',
-    ),
+    'EXCEPTION_HANDLER':
+    'authors.apps.core.exceptions.core_exception_handler',
+    'NON_FIELD_ERRORS_KEY':
+    'error',
+    'DEFAULT_AUTHENTICATION_CLASSES':
+    ('authors.apps.authentication.backends.JWTAuthentication', ),
 }
 if os.getenv('PRODUCTION', None):
     import django_heroku

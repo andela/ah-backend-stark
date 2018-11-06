@@ -186,8 +186,7 @@ class TestArticle(BaseTest):
     def test_liking_article_twice(self):
         """This method tests for updating liking an article"""
         self.mock_login()
-        self.client.post(
-            "/api/articles/", self.article_1, format="json")
+        self.client.post("/api/articles/", self.article_1, format="json")
         self.client.post(
             "/api/articles/titlely/like/", self.like_article, format="json")
         response1 = self.client.post(
@@ -213,23 +212,27 @@ class TestArticle(BaseTest):
     def test_post_comments_status_code(self):
         self.mock_login()
         self.client.post('/api/articles/', self.article_1, format="json")
-        response = self.client.post('/api/articles/titlely/comments/',
-                                    data={"comment": {
-                                        "body": "something else"
-                                    }
-                                    }, format="json")
+        response = self.client.post(
+            '/api/articles/titlely/comments/',
+            data={"comment": {
+                "body": "something else"
+            }},
+            format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_post_child_comments_status_code(self):
         self.mock_login()
         self.client.post('/api/articles/', self.article_1, format="json")
-        self.client.post('/api/articles/titlely/comments/',
-                         data=self.comment1, format="json")
-        response = self.client.post('/api/articles/titlely/comments/4/',
-                                    data={"reply": {
-                                        "body": "something else"
-                                    }
-                                    }, format="json")
+        self.client.post(
+            '/api/articles/titlely/comments/',
+            data=self.comment1,
+            format="json")
+        response = self.client.post(
+            '/api/articles/titlely/comments/4/',
+            data={"reply": {
+                "body": "something else"
+            }},
+            format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_favouriting_article(self):

@@ -14,6 +14,4 @@ class ProfileJSONRenderer(JSONRenderer):
 
             return super(ProfileJSONRenderer, self).render(data)
 
-        return json.dumps({
-            self.object_label: data
-        })
+        return json.dumps({self.object_label: data})

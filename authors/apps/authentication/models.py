@@ -3,9 +3,8 @@ import jwt
 from datetime import datetime, timedelta
 
 from django.conf import settings
-from django.contrib.auth.models import (
-    AbstractBaseUser, BaseUserManager, PermissionsMixin
-)
+from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
+                                        PermissionsMixin)
 from django.db import models
 
 
@@ -103,6 +102,21 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         return self.email
 
+    @staticmethod
+    def serialize(request, serializer_class):
+        user = request.data.get('user', {})
+        serializer = serializer_class(data=user)
+        serializer.is_valid(raise_exception=True)
+        return serializer
+
+    @staticmethod
+    def get_user_queryset(username):
+        return User.objects.filter(username=username)
+
+    @staticmethod
+    def get_user(user):
+        return user.values()
+
     @property
     def get_full_name(self):
         """
@@ -123,7 +137,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     def token(self):
         """This method creates a token for a user who registers successfully"""
         data = {
-            "id": self.id, "username": self.username,
+            "id": self.id,
+            "username": self.username,
             "exp": datetime.now() + timedelta(days=1)
         }
         token = jwt.encode(data, settings.SECRET_KEY).decode('utf-8')

@@ -67,7 +67,6 @@ class GetSingleArticleAPIView(APIView):
 
     def delete(self, request, slug):
         user = get_user_from_auth(request)
-        # returns (statusMessage, httpCode)
         status = Article.delete_article(user.id, slug)
         return Response({'message': status[0]}, status[1])
 

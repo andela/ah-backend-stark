@@ -38,8 +38,7 @@ class Article(models.Model):
         checking for its existence
         """
         slug = slugify(self.title)
-        current_slug_queryset = Article.objects.filter(
-            slug__istartswith=slug)
+        current_slug_queryset = Article.objects.filter(slug__istartswith=slug)
         slug_count = current_slug_queryset.count()
         unique_slug = slug
 
@@ -78,13 +77,11 @@ class Article(models.Model):
 
     @staticmethod
     def get_article_by_author(author_id, slug):
-        return Article.objects.filter(
-            author=author_id, slug=slug)
+        return Article.objects.filter(author=author_id, slug=slug)
 
     @staticmethod
     def delete_article(author_id, slug):
-        article = Article.objects.filter(
-            author=author_id, slug=slug)
+        article = Article.objects.filter(author=author_id, slug=slug)
         statusCode = 200
         message = 'Article deleted successfully'
 
@@ -103,8 +100,7 @@ class Article(models.Model):
 
     @staticmethod
     def update_article(author_id, slug, new_data):
-        article_queryset = Article.get_article_by_author(
-            author_id, slug)
+        article_queryset = Article.get_article_by_author(author_id, slug)
         article = article_queryset.first()
 
         statusCode = 202
@@ -118,8 +114,7 @@ class Article(models.Model):
             article.title = new_title
 
             new_slug = article.generate_slug()
-            new_description = new_data.get(
-                'description', article.description)
+            new_description = new_data.get('description', article.description)
             new_body = new_data.get('body', article.body)
             new_tagList = str(new_data.get('tagList', article.tagList))
             new_image = new_data.get('image', article.image)
@@ -174,8 +169,7 @@ class Article(models.Model):
         return formatted_data
 
     @staticmethod
-    def calculate_rating(
-            current_rating, current_rating_count, user_rating):
+    def calculate_rating(current_rating, current_rating_count, user_rating):
         """
         This method calculates the average rating considering the current
         average rating, the new user rating and the number of people who
@@ -189,19 +183,21 @@ class Article(models.Model):
     def __str__(self):
         return self.title
 
+    def count_likes_or_dislikes(self, action):
+        count = Likes.objects.all().filter(
+            article_id=self.id, action=action).count()
+        return count
+
     def likes(self):
-        likes = Likes.objects.all().filter(
-            article_id=self.id, action=True).count()
+        likes = self.count_likes_or_dislikes(True)
         return likes
 
     def dislikes(self):
-        dislikes = Likes.objects.all().filter(
-            article_id=self.id, action=False).count()
+        dislikes = self.count_likes_or_dislikes(False)
         return dislikes
 
     def favoritesCount(self):
-        favourite = Favourite.objects.all().filter(
-            article=self.id).count()
+        favourite = Favourite.objects.all().filter(article=self.id).count()
         return favourite
 
 
