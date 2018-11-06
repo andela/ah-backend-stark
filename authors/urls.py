@@ -15,10 +15,12 @@ Including another URLconf
 """
 from django.urls import path, include
 from django.contrib import admin
+from rest_framework.documentation import include_docs_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('authors.apps.authentication.urls')),
     path('api/', include('authors.apps.profiles.urls')),
     path('api/', include('authors.apps.articles.urls')),
+    path('coreapi-docs/', include_docs_urls(title="Author's Haven Stark"))
 ]
