@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 import os
 import dj_database_url
 from db_config import get_database_url
+from corsheaders.defaults import default_headers
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -31,6 +32,11 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 # Static files (Stylesheets, JS file, Images)
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 STATIC_URL = '/static/'
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_HEADERS = default_headers + (
+    'Token',
+)
 
 # Other places for collectstatic to find static files.
 STATICFILES_DIRS = (os.path.join(PROJECT_ROOT, 'static'), )
@@ -143,6 +149,8 @@ STATIC_URL = '/static/'
 CORS_ORIGIN_WHITELIST = (
     '0.0.0.0:4000',
     'localhost:4000',
+    'localhost:3000',
+    'ah-frontend-stark.herokuapp.com'
 )
 
 # Tell Django about the custom `User` model we created. The string
