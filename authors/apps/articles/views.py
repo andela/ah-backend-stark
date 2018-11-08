@@ -1,28 +1,36 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import status, serializers, exceptions
-from rest_framework.permissions import (IsAuthenticatedOrReadOnly,
-                                        IsAuthenticated)
+from rest_framework.generics import CreateAPIView, UpdateAPIView
+from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.permissions import (
+    IsAuthenticatedOrReadOnly, IsAuthenticated
+)
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.shortcuts import get_object_or_404
-from rest_framework.generics import (UpdateAPIView, CreateAPIView,
-                                     RetrieveAPIView)
-from .renderers import ArticleJSONRenderer, LikesJSONRenderer
-from .serializers import (ArticlesSerializer, CommentSerializer,
-                          CommentDetailSerializer, LikeSerializer)
-from .models import Article, Comment, Likes
+
 from authors.apps.authentication.backends import JWTAuthentication
-from django.shortcuts import get_object_or_404
+from .mixins import AhPaginationMixin
+from .models import Article, Likes, Comment
+from .renderers import ArticleJSONRenderer, LikesJSONRenderer
+from .serializers import (
+    ArticlesSerializer, CommentSerializer,
+    CommentDetailSerializer, LikeSerializer
+)
 
 
-class ArticleCreationAPIView(APIView):
-    permission_classes = (IsAuthenticatedOrReadOnly, )
+class ArticleCreationAPIView(APIView, AhPaginationMixin):
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     serializer_class = ArticlesSerializer
+    pagination_class = LimitOffsetPagination
 
     def get(self, request):
         article = Article.objects.all()
-        serializer = self.serializer_class(article, many=True)
-        res_data = Article.format_data_for_display(serializer.data)
-        return Response({"articles": res_data}, status.HTTP_200_OK)
+        page = self.paginate_queryset(article)
+        if page is not None:
+            serializer = self.serializer_class(page, many=True)
+            res_data = Article.format_data_for_display(serializer.data)
+            new_data = self.get_paginated_response(res_data)
+            return new_data
 
     def post(self, request):
         article = request.data.get('article')
