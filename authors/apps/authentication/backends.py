@@ -47,7 +47,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
     def decode_token(self, token):
         try:
             payload = jwt.decode(token, settings.SECRET_KEY)
-        except Exception as e:
+        except Exception:
             msg = 'The token is invalid'
             raise exceptions.AuthenticationFailed(msg)
 

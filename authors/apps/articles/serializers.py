@@ -51,24 +51,30 @@ class LikeSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    username = serializers.ReadOnlyField(source='user.username')
+
     class Meta:
         model = Comment
-        fields = ("id", "user", "body", "article", "timestamp")
+        fields = ("id", "user", "body", "article",
+                  "timestamp", "username")
 
 
 class ChildCommentSerializer(serializers.ModelSerializer):
+    username = serializers.ReadOnlyField(source='user.username')
+
     class Meta:
         model = Comment
-        fields = ("id", "body", "timestamp")
+        fields = ("id", "body", "timestamp", "username")
 
 
 class CommentDetailSerializer(serializers.ModelSerializer):
+    username = serializers.ReadOnlyField(source='user.username')
     replies = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
-        fields = ("id", "user", "body", "article", "timestamp", "replies",
-                  "parent_comment")
+        fields = ("id", "user", "body", "article",
+                  "timestamp", "replies", "parent_comment", "username")
 
     @staticmethod
     def get_replies(obj):
