@@ -177,6 +177,10 @@ class BaseTest(TestCase):
                 "description": "The description is also different"
             }
         }
+        self.like_article = {"like": {"action": 1}}
+        self.dislike_article = {"like": {"action": 0}}
+
+        self.user_email = {"user": {"email": "test@test.com"}}
 
         self.article_rating_4 = {"article": {"rating": 4}}
 
