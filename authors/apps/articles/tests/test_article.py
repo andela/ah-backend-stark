@@ -281,3 +281,65 @@ class TestArticle(BaseTest):
             "/api/articles/titlely/favourite/", format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         assert "error" in response.data
+
+    def test_search_article_by_author(self):
+        # create two articles using one user
+        self.mock_login()
+        self.create_article(self.article_1)
+        self.create_article(self.article_2)
+        # create two more article with a different user
+        self.different_user_mock_login()
+        self.create_article(self.article_3)
+        self.create_article(self.article_4)
+        author = self.reg_data.get('user')['username']
+        # get the articles of the first user
+        response = self.client.get(
+            '/api/articles/search/?author={}'.format(author))
+        self.assertEqual(len(response.data['search results']), 2)
+        self.assertEqual(response.status_code, 200)
+
+    def test_search_article_by_title(self):
+        # create two articles using one user
+        self.mock_login()
+        self.create_article(self.article_1)
+        self.create_article(self.article_2)
+        self.create_article(self.article_3)
+        title = self.article_2.get('article')['title']
+        response = self.client.get(
+            '/api/articles/search/?title={}'.format(title))
+        self.assertEqual(len(response.data['search results']), 1)
+        self.assertIn(title, str(response.data))
+
+    def test_search_article_by_tag(self):
+        self.mock_login()
+        self.create_article(self.article_1)
+        self.create_article(self.article_2)
+        response = self.client.get('/api/articles/search/?tag=Health')
+        self.assertEqual(len(response.data['search results']), 1)
+        self.assertEqual(response.status_code, 200)
+
+    def test_search_article_by_keywords(self):
+        self.mock_login()
+        self.create_article(self.article_1)
+        self.create_article(self.article_2)
+        self.create_article(self.article_3)
+
+        response = self.client.get('/api/articles/search/?keywords=title')
+        self.assertEqual(len(response.data['search results']), 2)
+        self.assertEqual(response.status_code, 200)
+
+    def search_article_with_all_parameters(self):
+        # create two articles using one user
+        self.mock_login()
+        self.create_article(self.article_1)
+        self.create_article(self.article_2)
+        self.create_article(self.article_3)
+        self.create_article(self.article_4)
+        author = self.reg_data.get('user')['username']
+        tag = 'Hello'
+        keywords = 'let,see'
+        response = self.client.get(
+            '/api/articles/search/?author={}&tag={}&keywords={}'.format(
+                author, tag, keywords))
+        self.assertEqual(len(response.data['search results']), 1)
+        self.assertEqual(response.status_code, 200)

@@ -59,6 +59,15 @@ class Article(models.Model):
 
         return unique_slug
 
+    @property
+    def tags(self):
+        items = literal_eval(self.tagList)
+        print(type(items))
+        if isinstance(items, list):
+            return items
+        else:
+            return []
+
     @staticmethod
     def title_exists(user_id, title):
         return Article.objects.filter(

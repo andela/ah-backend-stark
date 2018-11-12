@@ -2,7 +2,7 @@ from django.urls import path
 
 from .views import (ArticleCreationAPIView, GetSingleArticleAPIView,
                     PostCommentApiView, CommentDetailApiView,
-                    RateArticleAPIView, LikeView)
+                    RateArticleAPIView, LikeView, SearchArticleView)
 from .views_favourites import (FavouriteView, GetFavouriteView)
 urlpatterns = [
     path('articles/', ArticleCreationAPIView.as_view()),
@@ -14,4 +14,5 @@ urlpatterns = [
     path('articles/<str:slug>/like/', LikeView.as_view()),
     path('articles/<str:slug>/favourite/', FavouriteView.as_view()),
     path('articles/favourites/', GetFavouriteView.as_view()),
+    path('articles/search/', SearchArticleView.as_view()),
 ]
