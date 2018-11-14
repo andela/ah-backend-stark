@@ -4,7 +4,7 @@ from rest_framework import serializers
 from django.shortcuts import get_object_or_404
 
 from .models import User
-from .utils_ import sendMail
+from .send_email import send_email
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -157,10 +157,9 @@ class ResetPasswordSerializer(serializers.Serializer):
         recipient = user.email
         title = "Reset your Password"
         token = user.token()
-        url = "http://127.0.0.1:8000/api/password-reset/"
-        body = " follow this link to reset your password  {}{}/".format(
-            url, token)
-        sendMail(recipient, title, body)
+        url = "http://localhost:3000/password-reset/done"
+        body = " follow this link to reset your password  {}/".format(url)
+        send_email(recipient, title, body)
         return {
             'email': email,
             'token': token,
