@@ -16,7 +16,7 @@ from .mixins import AhPaginationMixin
 
 
 class ArticleCreationAPIView(APIView, AhPaginationMixin):
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticatedOrReadOnly, )
     serializer_class = ArticlesSerializer
     pagination_class = LimitOffsetPagination
 
