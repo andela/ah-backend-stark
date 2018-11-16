@@ -15,6 +15,9 @@ install:
   - pip install coveralls
   - pip install pycodestyle
 
+addons:
+  postgresql: 9.6
+
 before_script:
   - psql -c 'CREATE DATABASE test_db;' -U postgres
 

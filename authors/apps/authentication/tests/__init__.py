@@ -189,6 +189,13 @@ class BaseTest(TestCase):
         self.user_email = {"user": {"email": "test@test.com"}}
 
         self.comment1 = {"comment": {"body": "something else"}}
+
+        self.social_auth_dict = {
+            "email": "testingtest@test.com",
+            "username": "socialuser"
+        }
+        self.social_redirection_url = 'http://localhost:3000'
+
         # Test the article model functions
         self.article = Article.objects.create(
             title="lego",
