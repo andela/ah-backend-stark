@@ -73,8 +73,14 @@ class Following(models.Model):
 
     @staticmethod
     def get_list(request, username, query, serializer_class):
-        follow_details = Following.get_id_from_username(
-            username, Following.get_following)
+        if query == "followers":
+            follow_details = Following.get_id_from_username(
+                username, Following.get_followers)
+            list_id = "user_id"
+        elif query == "following":
+            follow_details = Following.get_id_from_username(
+                username, Following.get_following)
+            list_id = "following_id"
         check_id = follow_details[0]
         follow_list = follow_details[1]
         user_id = request.user.id
@@ -82,7 +88,6 @@ class Following(models.Model):
             query_response = Following.empty_list(query, check_id, user_id,
                                                   username)
         else:
-            list_id = "following_id"
             query_response = Following.get_profile_list(
                 follow_list, serializer_class, list_id)
         return query_response
