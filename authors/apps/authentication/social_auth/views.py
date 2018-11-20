@@ -19,6 +19,7 @@ class LaunchSocialAuthAPIView(APIView):
 
     def get(self, request):
 
+        unset_social_variables()
         redirect_url = self.get_redirect_url(request)
         protocol = request.scheme + '://'
         site_url = request.get_host()
@@ -85,7 +86,7 @@ class AuthenticateSocialLogin(APIView):
 
     def redirect_if_true(self):
         encoded_data = self.get_redirection_data()
-        redirect_url = get_env_variable('social_redirect_url')
+        redirect_url = get_env_variable('social_redirect_url').strip()
         if redirect_url:
             return HttpResponseRedirect(redirect_url + encoded_data)
 

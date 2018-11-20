@@ -3,7 +3,7 @@ from authors.apps.authentication.helpers import (
     get_env_variable, set_social_env_variable, generate_unique_username,
     get_base64_str)
 
-
+social_users = []
 def create_social_user(*args, **kwargs):
     details = kwargs['details']
 
