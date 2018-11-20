@@ -1,5 +1,4 @@
 class AhPaginationMixin(object):
-
     @property
     def paginator(self):
         """
