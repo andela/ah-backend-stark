@@ -6,11 +6,13 @@ from rest_framework.views import APIView
 
 from .backends import JWTAuthentication
 from .renderers import UserJSONRenderer
-from .send_email import send_mail
+from .send_email import send_email
 from .serializers import (LoginSerializer, RegistrationSerializer,
                           UserSerializer, ResetPasswordSerializer)
 from .models import User
 from .validation import validate
+from django.http import HttpResponseRedirect
+import base64
 
 
 class RegistrationAPIView(APIView):
@@ -21,6 +23,7 @@ class RegistrationAPIView(APIView):
 
     def post(self, request):
         user = request.data.get('user', {})
+        redirect_url = request.META.get('HTTP_REDIRECTTO', '')
         validate(user)
 
         # The create serializer, validate serializer, save serializer pattern
@@ -31,14 +34,25 @@ class RegistrationAPIView(APIView):
         serializer.save()
         recipient = serializer.data['email']
         subject = 'Activate Authors Haven Account'
-        host = 'http://' + request.get_host()
+
+        protocol = request.scheme + '://'
+        host = protocol + request.get_host()
         url = '/api/users/activate_account/'
         token = serializer.data['token']
+
+        encoded_url = str(base64.b64encode(bytes(redirect_url, 'utf-8')))
+        encoded_url = encoded_url[2:-1]  # remove b''
+        redirect_str = token + "$" + str(encoded_url)
         content = "Thank you for registering with Authors Haven.\
         Follow this link to activate your account {}{}{}/".format(
             host, url, token)
 
-        send_mail(recipient, subject, content)
+        if redirect_url:
+            content = "Thank you for registering with Authors Haven.\
+            Follow this link to activate your account {}{}{}/".format(
+                host, url, redirect_str)
+
+        send_email(recipient, subject, content)
         user_data = serializer.data
         user_data.update({
             "message":
@@ -133,12 +147,24 @@ class VerifyAccountAPIView(APIView, JWTAuthentication):
 
     # function to retrieve user info from the token
     def get(self, request, token):
+        redirect_url = ''
+        cleantoken = token
+        if '$' in str(token):
+            redirect_url = str(base64.b64decode((token.rsplit('$', 1)[1])))
+            redirect_url = redirect_url[2:-1]
+            cleantoken = str((token.rsplit('$')[0]))
         try:
-            user, token = self.get_verification_credencials(request, token)
+
+            user, token = self.get_verification_credencials(
+                request, cleantoken)
 
             if not user.is_verified:
                 user.is_verified = True
                 user.save()
+
+                if redirect_url:
+                    return HttpResponseRedirect(redirect_url)
+
                 return Response({
                     "message":
                     "Your account has been successfully " +
@@ -148,13 +174,19 @@ class VerifyAccountAPIView(APIView, JWTAuthentication):
                 },
                                 status=status.HTTP_200_OK)
 
+            if redirect_url:
+                return HttpResponseRedirect(redirect_url)
+
             return Response(
                 {
                     "message": "Account already activated. Please login"
                 },
                 status=status.HTTP_200_OK)
 
-        except Exception:
+        except Exception as e:
+            if redirect_url:
+                return HttpResponseRedirect(redirect_url)
+
             return Response({
                 "message":
                 "Sorry. Activation link " + "either expired or is invalid"
