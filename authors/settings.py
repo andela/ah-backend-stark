@@ -45,8 +45,11 @@ STATICFILES_DIRS = (os.path.join(PROJECT_ROOT, 'static'), )
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 ALLOWED_HOSTS = [
-    'ah-backend-stark-staging.herokuapp.com', 'ah-backend-stark.herokuapp.com',
-    'localhost', '127.0.0.1'
+    'ah-backend-stark-staging.herokuapp.com',
+    'ah-backend-stark.herokuapp.com',
+    'localhost',
+    '127.0.0.1',
+    'feaad467.ngrok.io',
 ]
 
 # Application definition

@@ -10,8 +10,9 @@ from authors.apps.authentication.models import User
 from django.http import HttpResponseRedirect
 from authors.apps.authentication.models import User
 from authors.apps.authentication.social_auth.helpers import (
-     generate_unique_username,
-    get_base64_str, add_user_to_queue, get_user_from_queue, redirect_url)
+    generate_unique_username, get_base64_str, add_user_to_queue,
+    get_user_from_queue, pop_user_from_queue, set_redirect_url,
+    get_redirect_url)
 
 
 class LaunchSocialAuthAPIView(APIView):
@@ -24,16 +25,16 @@ class LaunchSocialAuthAPIView(APIView):
         social_path = self.set_social_path(request)
         resolved_url = self.set_resolved_url(social_path)
         social_login_url = ''
+        set_redirect_url(request)
 
         social_login_url = protocol + site_url + resolved_url
 
         return HttpResponseRedirect(social_login_url)
 
-
     def set_social_path(self, request):
-        provider = request.query_params.get('Provider', '')
-        redirect_url = self.get_redirect_url(request)
-        social_path = request.get_full_path().lower()
+        provider = request.query_params.get('Provider')
+        redirect_url = get_redirect_url()
+        social_path = request.path.lower()
         if redirect_url:
             social_path = provider.lower()
 
@@ -54,21 +55,15 @@ class LaunchSocialAuthAPIView(APIView):
 
         return resolved_url
 
-    def get_redirect_url(self, request):
-        redirect_url = ''
-        social_url = request.query_params.get('RedirectTo', '')
-        redirect_url = request.META.get('HTTP_REDIRECTTO', social_url)
-
-        return redirect_url
-
 
 class AuthenticateSocialLogin(APIView):
     permission_classes = (AllowAny, )
 
     def get(self, request):
-        token = get_user_from_queue()['token']
-        email = get_user_from_queue()['email']
-        username = get_user_from_queue()['username']
+        token = get_user_from_queue().get('token', '')
+        email = get_user_from_queue().get('email', '')
+        username = get_user_from_queue().get('username', '')
+
         resp_data = {
             'message': 'Your social authentication was successful',
             'username': username,
@@ -81,14 +76,16 @@ class AuthenticateSocialLogin(APIView):
 
     def redirect_if_true(self):
         encoded_data = self.get_redirection_data()
+        redirect_url = get_redirect_url()
+        pop_user_from_queue()
 
         if redirect_url:
             return HttpResponseRedirect(redirect_url + encoded_data)
 
     def get_redirection_data(self):
-        token = get_user_from_queue()['token']
-        email = get_user_from_queue()['email']
-        username = get_user_from_queue()['username']
+        token = get_user_from_queue().get('token', '')
+        email = get_user_from_queue().get('email', '')
+        username = get_user_from_queue().get('username', '')
 
         param_string = "?t=" + get_base64_str(token)
         param_string += "&e=" + get_base64_str(email)
@@ -96,7 +93,6 @@ class AuthenticateSocialLogin(APIView):
         param_string += "&end="
 
         return param_string
-
 
 
 def create_social_user(*args, **kwargs):
