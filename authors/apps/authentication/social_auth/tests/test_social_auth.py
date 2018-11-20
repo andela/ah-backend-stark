@@ -1,6 +1,6 @@
 from rest_framework import status
 from authors.apps.authentication.tests import BaseTest
-from authors.apps.authentication.social_auth import create_social_user
+from authors.apps.authentication.social_auth.views import create_social_user
 
 
 class TestSocialAuth(BaseTest):
