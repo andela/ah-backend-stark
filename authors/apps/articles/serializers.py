@@ -8,6 +8,8 @@ class ArticlesSerializer(serializers.ModelSerializer):
     """
     Handles the serialization and deserialization of Article objects
     """
+    author_name = serializers.CharField(source='author.username',
+                                        required=False)
 
     def create(self, validated_data):
         """
@@ -19,7 +21,8 @@ class ArticlesSerializer(serializers.ModelSerializer):
         model = Article
         fields = ("slug", "title", "description", "body", "image", "tagList",
                   "createdAt", "updatedAt", "favoritesCount", "rating",
-                  "ratingsCount", "author", "likes", "dislikes")
+                  "ratingsCount", "author", "author_name", "likes", "dislikes")
+        read_only_fields = ('author_name', )
 
     @staticmethod
     def convert_tagList_to_str(request_data={}):
