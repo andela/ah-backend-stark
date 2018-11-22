@@ -14,7 +14,8 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         """profile app serializer meta class"""
         model = Profile
-        fields = ('username', 'bio', 'location', 'fun_fact', 'image')
+        fields = ('username', 'bio', 'location', 'fun_fact', 'image',
+                  'articles_read', 'articles_written')
         read_only_fields = ('username', )
 
 

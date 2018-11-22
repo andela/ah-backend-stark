@@ -9,8 +9,11 @@ from rest_framework.generics import (UpdateAPIView, CreateAPIView,
                                      RetrieveAPIView, ListAPIView)
 from .renderers import ArticleJSONRenderer, LikesJSONRenderer
 from .serializers import (ArticlesSerializer, CommentSerializer,
-                          CommentDetailSerializer, LikeSerializer)
-from .models import Article, Comment, Likes
+                          CommentDetailSerializer, LikeSerializer,
+                          ArticlesReadSerializer)
+from .models import Article, Comment, Likes, ArticlesRead
+from authors.apps.profiles.serializers import ProfileSerializer
+from authors.apps.profiles.models import Profile
 from authors.apps.authentication.backends import JWTAuthentication
 from .mixins import AhPaginationMixin
 
@@ -19,9 +22,10 @@ class ArticleCreationAPIView(APIView, AhPaginationMixin):
     permission_classes = (IsAuthenticatedOrReadOnly, )
     serializer_class = ArticlesSerializer
     pagination_class = LimitOffsetPagination
+    profile_serializer_class = ProfileSerializer
 
     def get(self, request):
-        article = Article.objects.all()
+        article = Article.objects.all().order_by('-id')
         page = self.paginate_queryset(article)
         if page is not None:
             serializer = self.serializer_class(page, many=True)
@@ -42,6 +46,9 @@ class ArticleCreationAPIView(APIView, AhPaginationMixin):
         serializer = self.serializer_class(data=article)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        action = "increment"
+        Profile.update_write_stats(request, self.profile_serializer_class,
+                                   action)
         res_data = Article.format_data_for_display(serializer.data)
         return Response(res_data, status=status.HTTP_201_CREATED)
 
@@ -50,6 +57,35 @@ class GetSingleArticleAPIView(APIView):
     permission_classes = (IsAuthenticatedOrReadOnly, )
     renderer_classes = (ArticleJSONRenderer, )
     serializer_class = ArticlesSerializer
+    articles_read_serializer_class = ArticlesReadSerializer
+    profile_serializer_class = ProfileSerializer
+
+    def check_authenticated(self, request, user, slug, author):
+        if user:
+            if ArticlesRead.already_read(user, slug) or user == author:
+                pass
+            else:
+                self.update_read_stats(user, request, slug)
+
+    def update_read_stats(self, user, request, slug):
+        """
+        This method increments the articles_read field
+        when a user reads an article
+        """
+        serializer_data = {"user": user, "slug": slug}
+        read_serializer = self.articles_read_serializer_class(
+            data=serializer_data)
+        read_serializer.is_valid(raise_exception=True)
+        read_serializer.save()
+        field_str = "articles_read"
+        user_id = request.user.id
+        instance = Profile.objects.filter(user_id=user_id)
+        username = instance.first()
+        profile = Profile.objects.select_related('user').get(
+            user__username=username)
+        action = "increment"
+        Profile.update_profile_stats(request, self.profile_serializer_class,
+                                     profile.articles_read, field_str, action)
 
     def get(self, request, slug):
         article = Article.get_article(slug)
@@ -57,6 +93,11 @@ class GetSingleArticleAPIView(APIView):
             raise exceptions.NotFound('The selected article was not found.')
         serializer = self.serializer_class(article)
         res_data = Article.format_data_for_display(serializer.data)
+        user = request.user.id
+        author = Article.get_single_article(slug)[0].author_id
+
+        self.check_authenticated(request, user, slug, author)
+
         return Response({"article": res_data}, status.HTTP_200_OK)
 
     def put(self, request, slug):
@@ -73,6 +114,9 @@ class GetSingleArticleAPIView(APIView):
     def delete(self, request, slug):
         user = get_user_from_auth(request)
         status = Article.delete_article(user.id, slug)
+        action = "decrement"
+        Profile.update_write_stats(request, self.profile_serializer_class,
+                                   action)
         return Response({'message': status[0]}, status[1])
 
 

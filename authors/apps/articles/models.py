@@ -2,8 +2,10 @@ import re
 from django.db import models
 from django.template.defaultfilters import slugify
 from authors.apps.authentication.models import User
+from authors.apps.profiles.models import Profile
 from ast import literal_eval
 from django.utils import timezone
+from readtime import of_text
 
 
 class Article(models.Model):
@@ -22,6 +24,7 @@ class Article(models.Model):
     rating = models.FloatField(default=0)
     ratingsCount = models.IntegerField(default=0)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+    read_time = models.CharField(max_length=100)
 
     class Meta:
         ordering = ['createdAt']
@@ -209,6 +212,10 @@ class Article(models.Model):
         favourite = Favourite.objects.all().filter(article=self.id).count()
         return favourite
 
+    def read(self):
+        read_time = str(of_text(self.body))
+        return read_time
+
 
 class Likes(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
@@ -250,3 +257,19 @@ class Favourite(models.Model):
 
     def __str__(self):
         return self.article.slug
+
+
+class ArticlesRead(models.Model):
+    """
+    model for articles read
+    """
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    slug = models.TextField()
+
+    def __str__(self):
+        return self.user
+
+    @staticmethod
+    def already_read(user, slug):
+        queryset = ArticlesRead.objects.filter(user=user, slug=slug)
+        return queryset.exists()

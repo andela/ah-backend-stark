@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Article, Likes, Comment, Favourite
+from .models import Article, Likes, Comment, Favourite, ArticlesRead
 from authors.apps.authentication.backends import JWTAuthentication
 from ast import literal_eval
 
@@ -8,6 +8,9 @@ class ArticlesSerializer(serializers.ModelSerializer):
     """
     Handles the serialization and deserialization of Article objects
     """
+    author_name = serializers.CharField(source='author.username',
+                                        required=False)
+    read_time = serializers.ReadOnlyField(source='read')
 
     def create(self, validated_data):
         """
@@ -19,7 +22,9 @@ class ArticlesSerializer(serializers.ModelSerializer):
         model = Article
         fields = ("slug", "title", "description", "body", "image", "tagList",
                   "createdAt", "updatedAt", "favoritesCount", "rating",
-                  "ratingsCount", "author", "likes", "dislikes")
+                  "ratingsCount", "author", "author_name",
+                  "likes", "dislikes", "read_time")
+        read_only_fields = ('author_name', )
 
     @staticmethod
     def convert_tagList_to_str(request_data={}):
@@ -55,8 +60,8 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ("id", "user", "body", "article",
-                  "timestamp", "username", "parent_comment")
+        fields = ("id", "user", "body", "article", "timestamp", "username",
+                  "parent_comment")
 
 
 class ChildCommentSerializer(serializers.ModelSerializer):
@@ -106,3 +111,14 @@ class GetFavouriteSerializer(serializers.ModelSerializer):
         """get favourite serializer meta class"""
         model = Favourite
         fields = ("title", "slug", "description")
+
+
+class ArticlesReadSerializer(serializers.ModelSerializer):
+    """
+    This serializer class handles articles read
+    """
+
+    class Meta:
+        """Articles Read serializer meta class"""
+        model = ArticlesRead
+        fields = ('user', 'slug')
