@@ -11,6 +11,7 @@ from .serializers import (LoginSerializer, RegistrationSerializer,
                           UserSerializer, ResetPasswordSerializer)
 from .models import User
 from .validation import validate
+from .helpers import clean_byte_str
 from django.http import HttpResponseRedirect
 import base64
 
@@ -41,7 +42,7 @@ class RegistrationAPIView(APIView):
         token = serializer.data['token']
 
         encoded_url = str(base64.b64encode(bytes(redirect_url, 'utf-8')))
-        encoded_url = encoded_url[2:-1]  # remove b''
+        encoded_url = clean_byte_str(encoded_url)
         redirect_str = token + "$" + str(encoded_url)
         content = "Thank you for registering with Authors Haven.\
         Follow this link to activate your account {}{}{}/".format(
@@ -120,9 +121,7 @@ class ResetPasswordView(RetrieveUpdateAPIView):
         host = 'https://ah-frontend-stark.herokuapp.com'
         url = '/password-reset/done/'
         content = "Follow this link to Reset\
-        your account password {}{}".format(
-            host, url
-        )
+        your account password {}{}".format(host, url)
         send_email(recipient, subject, content)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -164,7 +163,7 @@ class VerifyAccountAPIView(APIView, JWTAuthentication):
         cleantoken = token
         if '$' in str(token):
             redirect_url = str(base64.b64decode((token.rsplit('$', 1)[1])))
-            redirect_url = redirect_url[2:-1]
+            redirect_url = clean_byte_str(redirect_url)
             cleantoken = str((token.rsplit('$')[0]))
         try:
 
@@ -175,30 +174,31 @@ class VerifyAccountAPIView(APIView, JWTAuthentication):
                 user.is_verified = True
                 user.save()
 
-                if redirect_url:
-                    return HttpResponseRedirect(redirect_url)
+                return self.redirect_if_true(redirect_url) or Response(
+                    {
+                        "message":
+                        "Your account has been successfully " +
+                        "activated. Complete profile",
+                        "token":
+                        token
+                    },
+                    status=status.HTTP_200_OK)
 
-                return Response({
-                    "message":
-                    "Your account has been successfully " +
-                    "activated. Complete profile",
-                    "token":
-                    token
-                },
-                                status=status.HTTP_200_OK)
-
-            if redirect_url:
-                return HttpResponseRedirect(redirect_url)
-
-            return Response(
+            return self.redirect_if_true(redirect_url) or Response(
                 {
                     "message": "Account already activated. Please login"
                 },
                 status=status.HTTP_200_OK)
 
-        except Exception:
-            return Response({
-                "message":
-                "Sorry. Activation link " + "either expired or is invalid"
-            },
-                            status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+
+            return self.redirect_if_true(redirect_url) or Response(
+                {
+                    "message":
+                    "Sorry. Activation link " + "either expired or is invalid"
+                },
+                status=status.HTTP_400_BAD_REQUEST)
+
+    def redirect_if_true(self, redirect_url):
+        if redirect_url:
+            return HttpResponseRedirect(redirect_url)
