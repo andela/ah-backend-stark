@@ -120,7 +120,9 @@ class ResetPasswordView(RetrieveUpdateAPIView):
         host = 'https://ah-frontend-stark.herokuapp.com'
         url = '/password-reset/done/'
         content = "Follow this link to Reset\
-        your account password {}{}".format(host, url)
+        your account password {}{}".format(
+            host, url
+        )
         send_email(recipient, subject, content)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -194,10 +196,7 @@ class VerifyAccountAPIView(APIView, JWTAuthentication):
                 },
                 status=status.HTTP_200_OK)
 
-        except Exception as e:
-            if redirect_url:
-                return HttpResponseRedirect(redirect_url)
-
+        except Exception:
             return Response({
                 "message":
                 "Sorry. Activation link " + "either expired or is invalid"

@@ -5,6 +5,7 @@ from authors.apps.authentication.models import User
 from authors.apps.profiles.models import Profile
 from ast import literal_eval
 from django.utils import timezone
+from readtime import of_text
 
 
 class Article(models.Model):
@@ -23,6 +24,7 @@ class Article(models.Model):
     rating = models.FloatField(default=0)
     ratingsCount = models.IntegerField(default=0)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+    read_time = models.CharField(max_length=100)
 
     class Meta:
         ordering = ['createdAt']
@@ -209,6 +211,10 @@ class Article(models.Model):
     def favoritesCount(self):
         favourite = Favourite.objects.all().filter(article=self.id).count()
         return favourite
+
+    def read(self):
+        read_time = str(of_text(self.body))
+        return read_time
 
 
 class Likes(models.Model):
