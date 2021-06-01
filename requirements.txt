@@ -34,7 +34,7 @@ readtime==1.0.6
 requests==2.19.1
 sendgrid==5.6.0
 six==1.11.0
-urllib3==1.23
+urllib3==1.26.5
 whitenoise==4.1
 sendgrid==5.6.0
 autopep8==1.4
